@@ -1,5 +1,3 @@
-pragma solidity ^0.4.23
-
 // ----------------------------------------------------------------------------
 // Uhodchain Dapp
 // 
@@ -13,6 +11,9 @@ pragma solidity ^0.4.23
 // ERC Token Standard #20 Interface
 // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md
 // ----------------------------------------------------------------------------
+
+pragma solidity ^0.4.24;
+
 contract ERC20Interface {
     function totalSupply() public view returns (uint);
     function balanceOf(address tokenOwner) public view returns (uint balance);
@@ -207,41 +208,41 @@ library Properties {
         address[] index;
     }
 
-    event PropertyAdded(address indexed OwnerAddress, string location, uint totalAfter);
-    event PropertyRemoved(address indexed OwnerAddress, string location, uint totalAfter);
-    event PropertyLocationUpdated(address indexed OwnerAddress, string oldLocation, string newLocation);
+    event PropertyAdded(address indexed ownerAddress, string location, uint totalAfter);
+    event PropertyRemoved(address indexed ownerAddress, string location, uint totalAfter);
+    event propertyLocationUpdated(address indexed ownerAddress, string oldLocation, string newLocation);
 
     function init(Data storage self) public {
         require(!self.initialised);
         self.initialised = true;
     }
-    function isPropertyOwner(Data storage self, address OwnerAddress) public view returns (bool) {
-        return self.entries[OwnerAddress].exists;
+    function isPropertyOwner(Data storage self, address ownerAddress) public view returns (bool) {
+        return self.entries[ownerAddress].exists;
     }
-    function add(Data storage self, address OwnerAddress, string PropertyLocation) public {
-        require(!self.entries[OwnerAddress].exists);
-        self.index.push(OwnerAddress);
-        self.entries[OwnerAddress] = Property(true, self.index.length - 1, PropertyLocation);
-        emit PropertyAdded(OwnerAddress, PropertyLocation, self.index.length);
+    function add(Data storage self, address ownerAddress, string propertyLocation) public {
+        require(!self.entries[ownerAddress].exists);
+        self.index.push(ownerAddress);
+        self.entries[ownerAddress] = Property(true, self.index.length - 1, propertyLocation);
+        emit PropertyAdded(ownerAddress, propertyLocation, self.index.length);
     }
-    function remove(Data storage self, address OwnerAddress) public {
-        require(self.entries[OwnerAddress].exists);
-        uint removeIndex = self.entries[OwnerAddress].index;
-        emit PropertyRemoved(OwnerAddress, self.entries[OwnerAddress].location, self.index.length - 1);
+    function remove(Data storage self, address ownerAddress) public {
+        require(self.entries[ownerAddress].exists);
+        uint removeIndex = self.entries[ownerAddress].index;
+        emit PropertyRemoved(ownerAddress, self.entries[ownerAddress].location, self.index.length - 1);
         uint lastIndex = self.index.length - 1;
         address lastIndexAddress = self.index[lastIndex];
         self.index[removeIndex] = lastIndexAddress;
         self.entries[lastIndexAddress].index = removeIndex;
-        delete self.entries[OwnerAddress];
+        delete self.entries[ownerAddress];
         if (self.index.length > 0) {
             self.index.length--;
         }
     }
-    function setLocation(Data storage self, address OwnerAddress, string PropertyLocation) public {
-        Property storage Property = self.entries[OwnerAddress];
-        require(Property.exists);
-        emit PropertyLocationUpdated(OwnerAddress, Property.location, PropertyLocation);
-        Property.location = PropertyLocation;
+    function setLocation(Data storage self, address ownerAddress, string propertyLocation) public {
+        Property storage property = self.entries[ownerAddress];
+        require(property.exists);
+        emit propertyLocationUpdated(ownerAddress, property.location, propertyLocation);
+        property.location = propertyLocation;
     }
     function length(Data storage self) public view returns (uint) {
         return self.index.length;
@@ -259,7 +260,7 @@ contract Uhood {
     // string public name;
 
     UhoodTokenInterface public token;
-    Properties.Data Properties;
+    Properties.Data properties;
     // Proposals.Data public proposals;
     bool public initialised;
 
@@ -271,9 +272,9 @@ contract Uhood {
 
 
     // Must be copied here to be added to the ABI
-    event PropertyAdded(address indexed OwnerAddress, string name, uint totalAfter);
-    event PropertyRemoved(address indexed OwnerAddress, string name, uint totalAfter);
-    event PropertyNameUpdated(address indexed OwnerAddress, string oldName, string newName);
+    event PropertyAdded(address indexed ownerAddress, string name, uint totalAfter);
+    event PropertyRemoved(address indexed ownerAddress, string name, uint totalAfter);
+    event PropertyNameUpdated(address indexed ownerAddress, string oldName, string newName);
 
     // event NewProposal(uint indexed proposalId, Proposals.ProposalType indexed proposalType, address indexed proposer); 
     // event Voted(uint indexed proposalId, address indexed voter, bool vote, uint votedYes, uint votedNo);
@@ -285,38 +286,37 @@ contract Uhood {
 
 
     modifier onlyPropertyOwner {
-        require(Properties.isPropertyOwner(msg.sender));
+        require(properties.isPropertyOwner(msg.sender));
         _;
     }
 
-    constructor(string clubName, address uhoodToken, uint _tokensToAddNewProperties) public {
-        Properties.init();
-        name = clubName;
+    constructor(address uhoodToken, uint _tokensToAddNewProperties) public {
+        properties.init();        
         token = UhoodTokenInterface(uhoodToken);
         tokensToAddNewProperties = _tokensToAddNewProperties;
     }
-    function init(address OwnerAddress, string PropertyName) public {
+    function init(address ownerAddress, string propertyLocation) public {
         require(!initialised);
         initialised = true;
-        Properties.add(OwnerAddress, PropertyName);
-        token.mint(OwnerAddress, tokensToAddNewProperties);
+        properties.add(ownerAddress, propertyLocation);
+        token.mint(ownerAddress, tokensToAddNewProperties);
     }
-    function setPropertyName(string PropertyName) public {
-        Properties.setName(msg.sender, PropertyName);
+    function setPropertyLocation(string propertyLocation) public {
+        properties.setLocation(msg.sender, propertyLocation);
     }
 
     function numberOfProperties() public view returns (uint) {
-        return Properties.length();
+        return properties.length();
     }
     function getProperties() public view returns (address[]) {
-        return Properties.index;
+        return properties.index;
     }
-    function getPropertyData(address OwnerAddress) public view returns (bool _exists, uint _index, string _name) {
-        Properties.Property memory Property = Properties.entries[OwnerAddress];
-        return (Property.exists, Property.index, Property.name);
+    function getPropertyData(address ownerAddress) public view returns (bool _exists, uint _index, string _name) {
+        Properties.Property memory Property = properties.entries[ownerAddress];
+        return (Property.exists, Property.index, Property.location);
     }
     function getPropertyByIndex(uint _index) public view returns (address _Property) {
-        return Properties.index[_index];
+        return properties.index[_index];
     }
 
 }
