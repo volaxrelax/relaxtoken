@@ -1,6 +1,6 @@
-=============== Jun 3, 2018 (AEST) ===============
-21:51:19.761615 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
-21:51:19.767001 db@open opening
-21:51:19.773980 version@stat F·[] S·0B[] Sc·[]
-21:51:19.778140 db@janitor F·2 G·0
-21:51:19.778234 db@open done T·11.185345ms
+=============== Jun 6, 2018 (AEST) ===============
+21:46:23.717486 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+21:46:23.720571 db@open opening
+21:46:23.729862 version@stat F·[] S·0B[] Sc·[]
+21:46:23.732818 db@janitor F·2 G·0
+21:46:23.732905 db@open done T·12.286852ms

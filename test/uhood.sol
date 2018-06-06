@@ -28,15 +28,15 @@ contract ERC20Interface {
 
 
 // ----------------------------------------------------------------------------
-// ClubToken Interface = ERC20 + symbol + location + decimals + mint + burn
+// UhoodToken Interface = ERC20 + symbol + decimals + burn
 // + approveAndCall
 // ----------------------------------------------------------------------------
 contract UhoodTokenInterface is ERC20Interface {
     function symbol() public view returns (string);
-    function location() public view returns (string);
+    // function location() public view returns (string);
     function decimals() public view returns (uint8);
     function approveAndCall(address spender, uint tokens, bytes data) public returns (bool success);
-    function mint(address tokenOwner, uint tokens) public returns (bool success);
+    // function mint(address tokenOwner, uint tokens) public returns (bool success);
     function burn(address tokenOwner, uint tokens) public returns (bool success);
 }
 
@@ -113,8 +113,8 @@ contract Owned {
 contract UhoodToken is UhoodTokenInterface, Owned {
     using SafeMath for uint;
 
-    string _symbol;
-    string _location;
+    string _symbol;    
+    string _name;
     uint8 _decimals;
     uint _totalSupply;
 
@@ -122,16 +122,19 @@ contract UhoodToken is UhoodTokenInterface, Owned {
     mapping(address => mapping(address => uint)) allowed;
 
 
-    constructor(string symbol, string location, uint8 decimals) public {
+    constructor(string symbol, string name, uint8 decimals, uint totalSupply) public {
         _symbol = symbol;
-        _location = location;
+        _name = name;
         _decimals = decimals;
+        _totalSupply = totalSupply;
+        balances[msg.sender] = totalSupply;
+        emit Transfer(address(0), msg.sender, totalSupply);
     }
     function symbol() public view returns (string) {
         return _symbol;
     }
-    function location() public view returns (string) {
-        return _location;
+    function name() public view returns (string) {
+        return _name;
     }
     function decimals() public view returns (uint8) {
         return _decimals;
@@ -169,12 +172,12 @@ contract UhoodToken is UhoodTokenInterface, Owned {
         ApproveAndCallFallBack(spender).receiveApproval(msg.sender, tokens, this, data);
         return true;
     }
-    function mint(address tokenOwner, uint tokens) public onlyOwner returns (bool success) {
-        balances[tokenOwner] = balances[tokenOwner].add(tokens);
-        _totalSupply = _totalSupply.add(tokens);
-        emit Transfer(address(0), tokenOwner, tokens);
-        return true;
-    }
+    // function mint(address tokenOwner, uint tokens) public onlyOwner returns (bool success) {
+    //     balances[tokenOwner] = balances[tokenOwner].add(tokens);
+    //     _totalSupply = _totalSupply.add(tokens);
+    //     emit Transfer(address(0), tokenOwner, tokens);
+    //     return true;
+    // }
     function burn(address tokenOwner, uint tokens) public onlyOwner returns (bool success) {
         if (tokens > balances[tokenOwner]) {
             tokens = balances[tokenOwner];
@@ -265,6 +268,7 @@ contract Uhood {
     bool public initialised;
 
     uint public tokensToAddNewProperties = 100;
+    uint public tokensGivenToNewUser = 500;
 
     // uint public quorum = 80;
     // uint public quorumDecayPerWeek = 10;
@@ -295,11 +299,13 @@ contract Uhood {
         token = UhoodTokenInterface(uhoodToken);
         tokensToAddNewProperties = _tokensToAddNewProperties;
     }
-    function init(address ownerAddress, string propertyLocation) public {
+    // function init(address ownerAddress, string propertyLocation) public {
+    // address ownerAddress
+    function init() public {
         require(!initialised);
         initialised = true;
-        properties.add(ownerAddress, propertyLocation);
-        token.mint(ownerAddress, tokensToAddNewProperties);
+        // properties.add(ownerAddress, propertyLocation);
+        // token.mint(ownerAddress, tokensGivenToNewUser);
     }
     function setPropertyLocation(string propertyLocation) public {
         properties.setLocation(msg.sender, propertyLocation);

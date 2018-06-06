@@ -70,6 +70,7 @@ loadScript("functions.js");
 var uhoodAbi = JSON.parse(uhoodOutput.contracts["$UHOODSOL:Uhood"].abi);
 var uhoodBin = "0x" + uhoodOutput.contracts["$UHOODSOL:Uhood"].bin;
 var tokenAbi = JSON.parse(uhoodOutput.contracts["$UHOODSOL:UhoodToken"].abi);
+var tokenBin = "0x" + uhoodOutput.contracts["$UHOODSOL:UhoodToken"].bin;
 var propertiesLibAbi = JSON.parse(uhoodOutput.contracts["$UHOODSOL:Properties"].abi);
 var propertiesLibBin = "0x" + uhoodOutput.contracts["$UHOODSOL:Properties"].bin;
 
@@ -77,6 +78,7 @@ var propertiesLibBin = "0x" + uhoodOutput.contracts["$UHOODSOL:Properties"].bin;
 console.log("DATA: uhoodAbi=" + JSON.stringify(uhoodAbi));
 console.log("DATA: uhoodBin=" + JSON.stringify(uhoodBin));
 console.log("DATA: tokenAbi=" + JSON.stringify(tokenAbi));
+console.log("DATA: tokenBin=" + JSON.stringify(tokenBin));
 console.log("DATA: propertiesLibAbi=" + JSON.stringify(propertiesLibAbi));
 console.log("DATA: propertiesLibBin=" + JSON.stringify(propertiesLibBin));
 
@@ -152,23 +154,92 @@ printTxData("uhoodTx", uhoodTx);
 console.log("RESULT: ");
 
 
-exit;
+// -----------------------------------------------------------------------------
+var msg = "Deploy UhoodToken";
+var tokenSymbol = "UHT";
+var tokenName = "Uhood Token";
+var tokenDecimal = 18;
+var totalSupply = 100000000;
+// -----------------------------------------------------------------------------
+console.log("RESULT: ----- " + msg + " -----");
+var tokenContract = web3.eth.contract(tokenAbi);
+// console.log(JSON.stringify(clubContract));
+// console.log(JSON.stringify(tokenContract));
+var tokenTx = null;
+var tokenAddress = null;
+var token = tokenContract.new(tokenSymbol, tokenName, tokenDecimal, totalSupply, {from: contractOwnerAccount, data: tokenBin, gas: 7000000, gasPrice: defaultGasPrice},
+  function(e, contract) {
+    console.log(e);
+    if (!e) {
+      if (!contract.address) {
+        tokenTx = contract.transactionHash;
+      } else {
+        tokenAddress = contract.address;
+        addAccount(tokenAddress, "token");        
+        console.log("DATA: tokenAddress=" + tokenAddress);
+      }
+    }
+  }
+);
+while (txpool.status.pending > 0) {
+}
+addTokenContractAddressAndAbi(tokenAddress, tokenAbi);
+// console.log(tokenAddress);
+// console.log(JSON.stringify(tokenAbi));
+
+printBalances();
+failIfTxStatusError(tokenTx, msg);
+printTxData("tokenTx", tokenTx);
+console.log("RESULT: ");
+
 
 // -----------------------------------------------------------------------------
-var deployClubMessage = "Deploy Club Contract";
-var clubName = "Babysitters Club";
-var tokenSymbol = "SITS";
-var tokenName = "Sit Minutes";
-var tokenDecimal = 18;
-var memberName = "Alice";
-var tokensForNewMembers = new BigNumber(200 * 60).shift(18);
+var msg = "Transfer 1000 tokens to Alice";
 // -----------------------------------------------------------------------------
-console.log("RESULT: ----- " + deployClubMessage + " -----");
-var clubContract = web3.eth.contract(clubAbi);
-// console.log(JSON.stringify(clubContract));
-var tokenContract = web3.eth.contract(tokenAbi);
-// console.log(JSON.stringify(tokenContract));
-var deployClubTx = clubFactory.deployClubEthContract(clubName, tokenSymbol, tokenName, tokenDecimal, memberName, tokensForNewMembers, {from: aliceAccount, gas: 4000000, gasPrice: defaultGasPrice});
+console.log("RESULT: ----- " + msg + " -----");
+var transferTokensTx = token.transfer(aliceAccount, 1000, {from: contractOwnerAccount, gas: 500000, gasPrice: defaultGasPrice});
+while (txpool.status.pending > 0) {
+}
+printBalances();
+failIfTxStatusError(transferTokensTx, msg + " - transfer 1000 tokens to Alice");
+printTxData("transferTokensTx", transferTokensTx);
+printTokenContractDetails();
+console.log("RESULT: ");
+
+printBalances();
+
+
+// -----------------------------------------------------------------------------
+var msg = "Transfer 1000 tokens to Bob";
+// -----------------------------------------------------------------------------
+console.log("RESULT: ----- " + msg + " -----");
+var transferTokensTx2 = token.transfer(bobAccount, 1000, {from: contractOwnerAccount, gas: 500000, gasPrice: defaultGasPrice});
+while (txpool.status.pending > 0) {
+}
+printBalances();
+failIfTxStatusError(transferTokensTx2, msg + " - transfer 1000 tokens to Alice");
+printTxData("transferTokensTx2", transferTokensTx2);
+printTokenContractDetails();
+console.log("RESULT: ");
+
+printBalances();
+
+
+exit;
+
+
+
+
+
+transfer(address to, uint tokens)
+
+
+
+
+
+
+
+
 while (txpool.status.pending > 0) {
 }
 var results = getClubAndTokenListing();
@@ -194,6 +265,9 @@ printClubFactoryContractDetails();
 printTokenContractDetails();
 printClubContractDetails();
 console.log("RESULT: ");
+
+exit;
+
 
 
 // -----------------------------------------------------------------------------
