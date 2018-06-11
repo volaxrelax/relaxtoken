@@ -159,7 +159,7 @@ var msg = "Deploy UhoodToken";
 var tokenSymbol = "UHT";
 var tokenName = "Uhood Token";
 var tokenDecimal = 18;
-var totalSupply = 100000000;
+var totalSupply = new BigNumber("500000000").shift(18);
 // -----------------------------------------------------------------------------
 console.log("RESULT: ----- " + msg + " -----");
 var tokenContract = web3.eth.contract(tokenAbi);
@@ -194,35 +194,105 @@ console.log("RESULT: ");
 
 
 // -----------------------------------------------------------------------------
-var msg = "Transfer 1000 tokens to Alice";
+var msg = "Transfer 1000000 tokens to airdrop account";
 // -----------------------------------------------------------------------------
 console.log("RESULT: ----- " + msg + " -----");
-var transferTokensTx = token.transfer(aliceAccount, 1000, {from: contractOwnerAccount, gas: 500000, gasPrice: defaultGasPrice});
+var transferTokensTx = token.transfer(airdropAccount, new BigNumber("1000000").shift(18), {from: contractOwnerAccount, gas: 500000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
 }
-printBalances();
-failIfTxStatusError(transferTokensTx, msg + " - transfer 1000 tokens to Alice");
+failIfTxStatusError(transferTokensTx, msg + " - transfer 1000 tokens to airdrop account");
 printTxData("transferTokensTx", transferTokensTx);
-printTokenContractDetails();
 console.log("RESULT: ");
 
 printBalances();
 
 
 // -----------------------------------------------------------------------------
-var msg = "Transfer 1000 tokens to Bob";
+var msg = "Transfer 2000000 tokens to exchange";
 // -----------------------------------------------------------------------------
 console.log("RESULT: ----- " + msg + " -----");
-var transferTokensTx2 = token.transfer(bobAccount, 1000, {from: contractOwnerAccount, gas: 500000, gasPrice: defaultGasPrice});
+var transferTokensTx2 = token.transfer(exchangeAccount, new BigNumber("2000000").shift(18), {from: contractOwnerAccount, gas: 500000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
 }
-printBalances();
-failIfTxStatusError(transferTokensTx2, msg + " - transfer 1000 tokens to Alice");
+failIfTxStatusError(transferTokensTx2, msg + " - transfer 1000 tokens to Exchange Account");
 printTxData("transferTokensTx2", transferTokensTx2);
-printTokenContractDetails();
 console.log("RESULT: ");
 
 printBalances();
+
+
+// -----------------------------------------------------------------------------
+var msg = "Airdrop transfers 200 tokens to each property owner 1";
+// -----------------------------------------------------------------------------
+console.log("RESULT: ----- " + msg + " -----");
+var transferTokensTx3 = token.transfer(owner1Account, new BigNumber("200").shift(18), {from: airdropAccount, gas: 500000, gasPrice: defaultGasPrice});
+while (txpool.status.pending > 0) {
+}
+failIfTxStatusError(transferTokensTx3, msg + " - transfer 200 tokens to owner 1");
+printTxData("transferTokensTx3", transferTokensTx3);
+console.log("RESULT: ");
+
+printBalances();
+
+
+// -----------------------------------------------------------------------------
+var msg = "Airdrop transfers 200 tokens to each property owner 2";
+// -----------------------------------------------------------------------------
+console.log("RESULT: ----- " + msg + " -----");
+var transferTokensTx4 = token.transfer(owner2Account, new BigNumber("200").shift(18), {from: airdropAccount, gas: 500000, gasPrice: defaultGasPrice});
+while (txpool.status.pending > 0) {
+}
+failIfTxStatusError(transferTokensTx4, msg + " - transfer 200 tokens to owner 1");
+printTxData("transferTokensTx4", transferTokensTx4);
+console.log("RESULT: ");
+
+printBalances();
+
+
+// -----------------------------------------------------------------------------
+var msg = "Renter 1 buys 10000 tokens from the exchange";
+// -----------------------------------------------------------------------------
+console.log("RESULT: ----- " + msg + " -----");
+var transferTokensTx5 = token.transfer(renter1Account, new BigNumber("10000").shift(18), {from: exchangeAccount, gas: 500000, gasPrice: defaultGasPrice});
+while (txpool.status.pending > 0) {
+}
+failIfTxStatusError(transferTokensTx5, msg + " - transfer 10000 tokens to renter 1");
+printTxData("transferTokensTx5", transferTokensTx5);
+console.log("RESULT: ");
+
+printBalances();
+
+
+// -----------------------------------------------------------------------------
+var msg = "Renter 2 buys 10000 tokens from the exchange";
+// -----------------------------------------------------------------------------
+console.log("RESULT: ----- " + msg + " -----");
+var transferTokensTx6 = token.transfer(renter2Account, new BigNumber("10000").shift(18), {from: exchangeAccount, gas: 500000, gasPrice: defaultGasPrice});
+while (txpool.status.pending > 0) {
+}
+failIfTxStatusError(transferTokensTx6, msg + " - transfer 10000 tokens to renter 2");
+printTxData("transferTokensTx6", transferTokensTx6);
+console.log("RESULT: ");
+
+printBalances();
+
+
+// -----------------------------------------------------------------------------
+var msg = "Admin approves owner 1's request to add property 1 to the smart contract";
+// -----------------------------------------------------------------------------
+console.log("RESULT: ----- " + msg + " -----");
+var listingTx1 = uhood.addProperty(owner1Account, "1 Martin Pl, Sydney, Australia", {from: contractOwnerAccount, gas: 500000, gasPrice: defaultGasPrice});
+while (txpool.status.pending > 0) {
+}
+failIfTxStatusError(listingTx1, msg");
+printTxData("listingTx1", listingTx1);
+console.log("RESULT: uhood.getPropertyData=" + JSON.stringify(uhood.getPropertyData(owner1Account)));
+console.log("RESULT: ");
+
+printBalances();
+
+
+
 
 
 exit;
@@ -594,6 +664,6 @@ console.log("RESULT: ");
 
 EOF
 grep "DATA: " $TEST1OUTPUT | sed "s/DATA: //" > $DEPLOYMENTDATA
-# cat $DEPLOYMENTDATA
+#cat $DEPLOYMENTDATA
 grep "RESULT: " $TEST1OUTPUT | sed "s/RESULT: //" > $TEST1RESULTS
-# cat $TEST1RESULTS
+cat $TEST1RESULTS

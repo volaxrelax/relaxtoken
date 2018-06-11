@@ -255,7 +255,8 @@ library Properties {
 // ----------------------------------------------------------------------------
 // Uhood
 // ----------------------------------------------------------------------------
-contract Uhood {
+contract Uhood is Owned {
+    // TODO: create multiple owner/admins to approve property listing
     using SafeMath for uint;
     using Properties for Properties.Data;
     // using Proposals for Proposals.Data;
@@ -306,6 +307,9 @@ contract Uhood {
         initialised = true;
         // properties.add(ownerAddress, propertyLocation);
         // token.mint(ownerAddress, tokensGivenToNewUser);
+    }
+    function addProperty(address propertyOwner, string propertyLocation) public onlyOwner() {
+        properties.add(propertyOwner, propertyLocation);
     }
     function setPropertyLocation(string propertyLocation) public {
         properties.setLocation(msg.sender, propertyLocation);
