@@ -21,3 +21,9 @@ The official Github repo of Uhood Chain
 - [ ] Owner 2 can update the info
 - [ ] Owner and admin can delist 
 
+## Conversation
+- [ ] Renter 1 
+- [ ] Owner 1
+- [ ] Renter 1 starts application form, provide applicant information (number of applicant, name, licence no., DOB), employment information (current job title, current employer, annual salary, reference contact, previous job title, previous employer, previous annual salary), rental history information (current rental address, current agency, current agency contact,current rental price, reason to leave, previous rental address, previous agency, previous agency contact) 
+- [ ] Owner 1 
+
