@@ -22,8 +22,11 @@ The official Github repo of Uhood Chain
 - [ ] Owner and admin can delist 
 
 ## Conversation
-- [ ] Renter 1 
+- [ ] Renter 1,2
 - [ ] Owner 1
-- [ ] Renter 1 starts application form, provide applicant information (number of applicant, name, licence no., DOB), employment information (current job title, current employer, annual salary, reference contact, previous job title, previous employer, previous annual salary), rental history information (current rental address, current agency, current agency contact,current rental price, reason to leave, previous rental address, previous agency, previous agency contact) 
-- [ ] Owner 1 
+- [ ] Renter 1 starts application form, provide offer price, applicant information (number of applicant, name, licence no., DOB), employment information (current job title, current employer, annual salary, reference contact, previous job title, previous employer, previous annual salary), rental history information (current rental address, current agency, current agency contact,current rental price, reason to leave, previous rental address, previous agency, previous agency contact) 
+- [ ] Renter 1's application information (Avatar name 'renter 1', offer price, entry date) will be updated to the listing (visible to public)
+- [ ] Renter 2 starts application form, provide offer price, applicant information
+- [ ] Renter 2's application information (Avatar name 'renter 1', offer price, entry date) will be updated to the listing (visible to public)
+- [ ] Owner 1 have 14 days to approve 
 
