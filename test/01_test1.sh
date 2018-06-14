@@ -167,7 +167,7 @@ var tokenContract = web3.eth.contract(tokenAbi);
 // console.log(JSON.stringify(tokenContract));
 var tokenTx = null;
 var tokenAddress = null;
-var token = tokenContract.new(tokenSymbol, tokenName, tokenDecimal, totalSupply, {from: contractOwnerAccount, data: tokenBin, gas: 7000000, gasPrice: defaultGasPrice},
+var token = tokenContract.new(tokenSymbol, tokenName, tokenDecimal, totalSupply, {from: contractOwnerAccount, data: tokenBin, gas: 6000000, gasPrice: defaultGasPrice},
   function(e, contract) {
     console.log(e);
     if (!e) {
@@ -277,38 +277,45 @@ console.log("RESULT: ");
 printBalances();
 
 
+// // -----------------------------------------------------------------------------
+// var approveAndCallTestMessage = "Test approveAndCall 123.456 tokens with 'Hello' message";
+// // -----------------------------------------------------------------------------
+// console.log("RESULT: --- " + approveAndCallTestMessage + " ---");
+// var approveAndCallTest1Tx = token.approveAndCall(uhoodAddress,  "123456000000000000000", "Hello", {from: owner1Account, gas: 400000, gasPrice: defaultGasPrice});
+// while (txpool.status.pending > 0) {
+// }
+// printBalances();
+// failIfTxStatusError(approveAndCallTest1Tx, approveAndCallTestMessage);
+// printTxData("approveToken1Tx", approveAndCallTest1Tx);
+// printTokenContractDetails();
+// printTestContractDetails();
+// console.log("RESULT: ");
+
+
+// exit;
+
+
 // -----------------------------------------------------------------------------
-var msg = "Admin approves owner 1's request to add property 1 to the smart contract";
+var msg = "Owner 1 pays 100 tokens to add property 1 to the smart contract";
 // -----------------------------------------------------------------------------
 console.log("RESULT: ----- " + msg + " -----");
-var listingTx1 = uhood.addProperty(owner1Account, "1 Martin Pl, Sydney, Australia", {from: contractOwnerAccount, gas: 500000, gasPrice: defaultGasPrice});
+var listingTx1 = token.approve(uhoodAddress, new BigNumber("200").shift(18), {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
 }
-failIfTxStatusError(listingTx1, msg");
-printTxData("listingTx1", listingTx1);
+var listingTx2 = uhood.addProperty(owner1Account, "1 Martin Pl, Sydney, Australia", {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
+while (txpool.status.pending > 0) {
+}
+// failIfTxStatusError(listingTx1, "Owner 1 allows the smart contract to spend up to 200 tokens");
+failIfTxStatusError(listingTx2, msg);
+// printTxData("listingTx1", listingTx1);
+printTxData("listingTx2", listingTx2);
 console.log("RESULT: uhood.getPropertyData=" + JSON.stringify(uhood.getPropertyData(owner1Account)));
 console.log("RESULT: ");
 
 printBalances();
 
 
-
-
-
 exit;
-
-
-
-
-
-transfer(address to, uint tokens)
-
-
-
-
-
-
-
 
 while (txpool.status.pending > 0) {
 }
@@ -664,6 +671,6 @@ console.log("RESULT: ");
 
 EOF
 grep "DATA: " $TEST1OUTPUT | sed "s/DATA: //" > $DEPLOYMENTDATA
-#cat $DEPLOYMENTDATA
+cat $DEPLOYMENTDATA
 grep "RESULT: " $TEST1OUTPUT | sed "s/RESULT: //" > $TEST1RESULTS
 cat $TEST1RESULTS

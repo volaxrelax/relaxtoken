@@ -47,7 +47,12 @@ contract UhoodTokenInterface is ERC20Interface {
 // Borrowed from MiniMeToken
 // ----------------------------------------------------------------------------
 contract ApproveAndCallFallBack {
-    function receiveApproval(address from, uint256 tokens, address token, bytes data) public;
+    event LogBytes(bytes data);
+
+    function receiveApproval(address from, uint256 tokens, address token, bytes data) public {
+        ERC20Interface(token).transferFrom(from, address(this), tokens);
+        emit LogBytes(data);
+    }
 }
 
 
@@ -269,7 +274,7 @@ contract Uhood is Owned {
     bool public initialised;
 
     uint public tokensToAddNewProperties = 100;
-    uint public tokensGivenToNewUser = 500;
+    // uint public tokensGivenToNewUser = 500;
 
     // uint public quorum = 80;
     // uint public quorumDecayPerWeek = 10;
@@ -308,7 +313,12 @@ contract Uhood is Owned {
         // properties.add(ownerAddress, propertyLocation);
         // token.mint(ownerAddress, tokensGivenToNewUser);
     }
-    function addProperty(address propertyOwner, string propertyLocation) public onlyOwner() {
+    function addProperty(address propertyOwner, string propertyLocation) public {
+        Properties.Property memory Property = properties.entries[msg.sender];
+        require(!Property.exists);
+        // require(token.approveAndCall(address(this), tokensToAddNewProperties, ""));
+        // require(token.balanceOf(msg.sender) > tokensToAddNewProperties);        
+        require(token.transferFrom(msg.sender, address(this), tokensToAddNewProperties) == true);
         properties.add(propertyOwner, propertyLocation);
     }
     function setPropertyLocation(string propertyLocation) public {
