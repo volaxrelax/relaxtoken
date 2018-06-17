@@ -314,12 +314,15 @@ contract Uhood is Owned {
         // token.mint(ownerAddress, tokensGivenToNewUser);
     }
     function addProperty(address propertyOwner, string propertyLocation) public {
-        Properties.Property memory Property = properties.entries[msg.sender];
-        require(!Property.exists);
+        // Properties.Property memory Property = properties.entries[msg.sender];
+        // require(!Property.exists);
         // require(token.approveAndCall(address(this), tokensToAddNewProperties, ""));
         // require(token.balanceOf(msg.sender) > tokensToAddNewProperties);        
         require(token.transferFrom(msg.sender, address(this), tokensToAddNewProperties) == true);
-        properties.add(propertyOwner, propertyLocation);
+        // properties.add(propertyOwner, propertyLocation);
+    }
+    function payTokens() public view returns (bool){        
+        require(token.transferFrom(msg.sender, this, 12));
     }
     function setPropertyLocation(string propertyLocation) public {
         properties.setLocation(msg.sender, propertyLocation);

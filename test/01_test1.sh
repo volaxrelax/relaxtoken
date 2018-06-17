@@ -208,6 +208,35 @@ printBalances();
 
 
 // -----------------------------------------------------------------------------
+var msg = "Allows airdrop account to take 1000000 tokens";
+// -----------------------------------------------------------------------------
+console.log("RESULT: ----- " + msg + " -----");
+var transferTokensTx2 = token.approve(airdropAccount, new BigNumber("1000000").shift(18), {from: contractOwnerAccount, gas: 500000, gasPrice: defaultGasPrice});
+while (txpool.status.pending > 0) {
+}
+failIfTxStatusError(transferTokensTx2, msg);
+printTxData("transferTokensTx2", transferTokensTx2);
+printBalances();
+console.log("RESULT: ");
+
+
+var transferTokensTx3 = token.transferFrom(contractOwnerAccount, airdropAccount, new BigNumber("1000000").shift(18), {from: airdropAccount, gas: 500000, gasPrice: defaultGasPrice});
+while (txpool.status.pending > 0) {
+}
+failIfTxStatusError(transferTokensTx3, msg);
+printTxData("transferTokensTx3", transferTokensTx3);
+printBalances();
+console.log("RESULT: ");
+
+
+// var approveAndCallTest1Tx = token.approveAndCall(airdropAccount,  new BigNumber("1000000").shift(18), "Hello", {from: contractOwnerAccount, gas: 6000000, gasPrice: defaultGasPrice});
+// while (txpool.status.pending > 0) {
+// }
+// failIfTxStatusError(approveAndCallTest1Tx, msg);
+// printTxData("approveAndCallTest1Tx", approveAndCallTest1Tx);
+// printBalances();
+// console.log("RESULT: ");
+// -----------------------------------------------------------------------------
 var msg = "Transfer 2000000 tokens to exchange";
 // -----------------------------------------------------------------------------
 console.log("RESULT: ----- " + msg + " -----");
@@ -302,17 +331,32 @@ console.log("RESULT: ----- " + msg + " -----");
 var listingTx1 = token.approve(uhoodAddress, new BigNumber("200").shift(18), {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
 }
-var listingTx2 = uhood.addProperty(owner1Account, "1 Martin Pl, Sydney, Australia", {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
+
+// var listingTx2 = token.transferFrom(owner1Account, uhoodAddress, new BigNumber("1000000").shift(18), {from: airdropAccount, gas: 500000, gasPrice: defaultGasPrice});
+var listingTx2 = uhood.payTokens({from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});  
+
 while (txpool.status.pending > 0) {
 }
-// failIfTxStatusError(listingTx1, "Owner 1 allows the smart contract to spend up to 200 tokens");
-failIfTxStatusError(listingTx2, msg);
-// printTxData("listingTx1", listingTx1);
-printTxData("listingTx2", listingTx2);
-console.log("RESULT: uhood.getPropertyData=" + JSON.stringify(uhood.getPropertyData(owner1Account)));
-console.log("RESULT: ");
-
+console.log(listingTx2);
+// failIfTxStatusError(listingTx2, msg);
+// printTxData("listingTx2", listingTx2);
 printBalances();
+
+// var listingTx2 = uhood.addProperty(owner1Account, "1 Martin Pl, Sydney, Australia", {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
+// var listingTx2 = token.symbol();
+// printTokenContractDetails();
+// console.log("RESULT: " + token.totalSupply());
+// while (txpool.status.pending > 0) {
+// }
+// console.log(listingTx2);
+// failIfTxStatusError(listingTx1, "Owner 1 allows the smart contract to spend up to 200 tokens");
+// failIfTxStatusError(listingTx2, msg);
+// printTxData("listingTx1", listingTx1);
+// printTxData("listingTx2", listingTx2);
+// console.log("RESULT: uhood.getPropertyData=" + JSON.stringify(uhood.getPropertyData(owner1Account)));
+// console.log("RESULT: ");
+
+// printBalances();
 
 
 exit;
@@ -671,6 +715,6 @@ console.log("RESULT: ");
 
 EOF
 grep "DATA: " $TEST1OUTPUT | sed "s/DATA: //" > $DEPLOYMENTDATA
-cat $DEPLOYMENTDATA
+#cat $DEPLOYMENTDATA
 grep "RESULT: " $TEST1OUTPUT | sed "s/RESULT: //" > $TEST1RESULTS
-cat $TEST1RESULTS
+#cat $TEST1RESULTS
