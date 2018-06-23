@@ -339,7 +339,7 @@ failIfTxStatusError(listingTx1b, "listingTx1b");
 
 printBalances();
 
-console.log("RESULT: uhood.getPropertyData=" + JSON.stringify(uhood.getPropertyData(owner1Account)));
+console.log("RESULT: uhood.getPropertyData=" + JSON.stringify(uhood.getPropertyData(owner1Account, "1 Martin Pl, Sydney, Australia")));
 console.log("RESULT: uhood.tokensToAddNewProperties=" + uhood.tokensToAddNewProperties.call());
 console.log("RESULT: uhood.tokenAddress=" + uhood.tokenAddress.call());
 console.log("RESULT: ");
