@@ -1,9 +1,7 @@
 // ----------------------------------------------------------------------------
 // Uhodchain Dapp
-// 
 // https://github.com/vincentshangjin/uhoodchain
 // Based on ClubEth.App Project https://github.com/bokkypoobah/ClubEth
-// 
 // the Uhoodchain Dapp Project - 2018. The MIT Licence.
 // ----------------------------------------------------------------------------
 
@@ -13,6 +11,7 @@
 // ----------------------------------------------------------------------------
 
 pragma solidity ^0.4.24;
+
 
 contract ERC20Interface {
     function totalSupply() public view returns (uint);
@@ -60,18 +59,22 @@ contract ApproveAndCallFallBack {
 // Safe maths
 // ----------------------------------------------------------------------------
 library SafeMath {
+
     function add(uint a, uint b) internal pure returns (uint c) {
         c = a + b;
         require(c >= a);
     }
+
     function sub(uint a, uint b) internal pure returns (uint c) {
         require(b <= a);
         c = a - b;
     }
+
     function mul(uint a, uint b) internal pure returns (uint c) {
         c = a * b;
         require(a == 0 || c / a == b);
     }
+
     function div(uint a, uint b) internal pure returns (uint c) {
         require(b > 0);
         c = a / b;
@@ -96,15 +99,18 @@ contract Owned {
     constructor() public {
         owner = msg.sender;
     }
+
     function transferOwnership(address _newOwner) public onlyOwner {
         newOwner = _newOwner;
     }
+
     function acceptOwnership() public {
         require(msg.sender == newOwner);
         emit OwnershipTransferred(owner, newOwner);
         owner = newOwner;
         newOwner = address(0);
     }
+
     function transferOwnershipImmediately(address _newOwner) public onlyOwner {
         emit OwnershipTransferred(owner, _newOwner);
         owner = _newOwner;
@@ -118,7 +124,7 @@ contract Owned {
 contract UhoodToken is UhoodTokenInterface, Owned {
     using SafeMath for uint;
 
-    string _symbol;    
+    string _symbol;
     string _name;
     uint8 _decimals;
     uint _totalSupply;
@@ -205,7 +211,7 @@ contract UhoodToken is UhoodTokenInterface, Owned {
 // Property Data Structure
 // ----------------------------------------------------------------------------
 library Properties {
-    struct Property {        
+    struct Property {
         bool exists;
         uint index;
         string location;
@@ -268,13 +274,16 @@ contract Uhood is Owned {
 
     // string public name;
 
-    UhoodTokenInterface public token;
+    UhoodTokenInterface public token;    
     Properties.Data properties;
     // Proposals.Data public proposals;
     bool public initialised;
 
-    uint public tokensToAddNewProperties = 100;
+    uint public tokensToAddNewProperties;
+    address public tokenAddress;
     // uint public tokensGivenToNewUser = 500;
+    mapping(address => mapping(address => uint)) public balances;
+
 
     // uint public quorum = 80;
     // uint public quorumDecayPerWeek = 10;
@@ -285,8 +294,9 @@ contract Uhood is Owned {
     event PropertyAdded(address indexed ownerAddress, string name, uint totalAfter);
     event PropertyRemoved(address indexed ownerAddress, string name, uint totalAfter);
     event PropertyNameUpdated(address indexed ownerAddress, string oldName, string newName);
+    event TokensDeposited(address depositor, address tokenAddress, uint tokens, uint balanceAfter);
 
-    // event NewProposal(uint indexed proposalId, Proposals.ProposalType indexed proposalType, address indexed proposer); 
+    // event NewProposal(uint indexed proposalId, Proposals.ProposalType indexed proposalType, address indexed proposer);
     // event Voted(uint indexed proposalId, address indexed voter, bool vote, uint votedYes, uint votedNo);
     // event VoteResult(uint indexed proposalId, bool pass, uint votes, uint quorumPercent, uint PropertiesLength, uint yesPercent, uint requiredMajority);
     // event TokenUpdated(address indexed oldToken, address indexed newToken);
@@ -301,8 +311,9 @@ contract Uhood is Owned {
     }
 
     constructor(address uhoodToken, uint _tokensToAddNewProperties) public {
-        properties.init();        
+        properties.init();
         token = UhoodTokenInterface(uhoodToken);
+        tokenAddress = uhoodToken;
         tokensToAddNewProperties = _tokensToAddNewProperties;
     }
     // function init(address ownerAddress, string propertyLocation) public {
@@ -313,17 +324,27 @@ contract Uhood is Owned {
         // properties.add(ownerAddress, propertyLocation);
         // token.mint(ownerAddress, tokensGivenToNewUser);
     }
-    function addProperty(address propertyOwner, string propertyLocation) public {
+
+    function depositTokens(address tokenAddress, uint tokens) public {
+        require(tokenAddress != 0 && tokens != 0);        
+        require(ERC20Interface(tokenAddress).transferFrom(msg.sender, this, tokens));        
+        balances[tokenAddress][msg.sender] = balances[tokenAddress][msg.sender].add(tokens);
+        emit TokensDeposited(msg.sender, tokenAddress, tokens, balances[tokenAddress][msg.sender]);
+    }
+
+    function addProperty(uint tokens, address propertyOwner, string propertyLocation) public {
         // Properties.Property memory Property = properties.entries[msg.sender];
         // require(!Property.exists);
         // require(token.approveAndCall(address(this), tokensToAddNewProperties, ""));
-        // require(token.balanceOf(msg.sender) > tokensToAddNewProperties);        
-        require(token.transferFrom(msg.sender, address(this), tokensToAddNewProperties) == true);
-        // properties.add(propertyOwner, propertyLocation);
+        // require(token.balanceOf(msg.sender) > tokensToAddNewProperties);
+        require(tokenAddress != 0 && tokens >= tokensToAddNewProperties);
+        require(ERC20Interface(tokenAddress).transferFrom(msg.sender, this, tokensToAddNewProperties));
+        balances[tokenAddress][msg.sender] = balances[tokenAddress][msg.sender].add(tokensToAddNewProperties);
+        emit TokensDeposited(msg.sender, tokenAddress, tokensToAddNewProperties, balances[tokenAddress][msg.sender]);
+
+        properties.add(propertyOwner, propertyLocation);
     }
-    function payTokens() public view returns (bool){        
-        require(token.transferFrom(msg.sender, this, 12));
-    }
+
     function setPropertyLocation(string propertyLocation) public {
         properties.setLocation(msg.sender, propertyLocation);
     }
@@ -331,17 +352,18 @@ contract Uhood is Owned {
     function numberOfProperties() public view returns (uint) {
         return properties.length();
     }
+
     function getProperties() public view returns (address[]) {
         return properties.index;
     }
+
     function getPropertyData(address ownerAddress) public view returns (bool _exists, uint _index, string _name) {
         Properties.Property memory Property = properties.entries[ownerAddress];
         return (Property.exists, Property.index, Property.location);
     }
+
     function getPropertyByIndex(uint _index) public view returns (address _Property) {
         return properties.index[_index];
     }
 
 }
-
-
