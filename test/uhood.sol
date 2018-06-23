@@ -316,33 +316,22 @@ contract Uhood is Owned {
         tokenAddress = uhoodToken;
         tokensToAddNewProperties = _tokensToAddNewProperties;
     }
-    // function init(address ownerAddress, string propertyLocation) public {
-    // address ownerAddress
+    
     function init() public {
         require(!initialised);
-        initialised = true;
-        // properties.add(ownerAddress, propertyLocation);
-        // token.mint(ownerAddress, tokensGivenToNewUser);
+        initialised = true;        
     }
 
-    function depositTokens(address tokenAddress, uint tokens) public {
-        require(tokenAddress != 0 && tokens != 0);        
-        require(ERC20Interface(tokenAddress).transferFrom(msg.sender, this, tokens));        
-        balances[tokenAddress][msg.sender] = balances[tokenAddress][msg.sender].add(tokens);
-        emit TokensDeposited(msg.sender, tokenAddress, tokens, balances[tokenAddress][msg.sender]);
-    }
+    function addProperty(address propertyOwner, string propertyLocation) public {
 
-    function addProperty(uint tokens, address propertyOwner, string propertyLocation) public {
-        // Properties.Property memory Property = properties.entries[msg.sender];
-        // require(!Property.exists);
-        // require(token.approveAndCall(address(this), tokensToAddNewProperties, ""));
-        // require(token.balanceOf(msg.sender) > tokensToAddNewProperties);
-        require(tokenAddress != 0 && tokens >= tokensToAddNewProperties);
-        require(ERC20Interface(tokenAddress).transferFrom(msg.sender, this, tokensToAddNewProperties));
+        // TODO: implement approveAndCall
+        // require(token.approveAndCall(this, tokensToAddNewProperties, ""));
+       
+        require(token.transferFrom(msg.sender, this, tokensToAddNewProperties));
         balances[tokenAddress][msg.sender] = balances[tokenAddress][msg.sender].add(tokensToAddNewProperties);
         emit TokensDeposited(msg.sender, tokenAddress, tokensToAddNewProperties, balances[tokenAddress][msg.sender]);
-
         properties.add(propertyOwner, propertyLocation);
+
     }
 
     function setPropertyLocation(string propertyLocation) public {

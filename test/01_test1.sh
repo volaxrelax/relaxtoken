@@ -322,18 +322,17 @@ printBalances();
 // console.log("RESULT: ");
 
 // -----------------------------------------------------------------------------
-var msg = "Owner 1 pays 100 tokens to add property 1 to the smart contract";
+var msg = "Owner 1 deposits 100 tokens to add property 1 to the smart contract";
 // -----------------------------------------------------------------------------
 console.log("RESULT: ----- " + msg + " -----");
 printBalances();
 
-// uhoodAddress
 var listingTx1a = token.approve(uhoodAddress, new BigNumber("200").shift(18), {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
 }
 failIfTxStatusError(listingTx1a, "listingTx1a");
 
-var listingTx1b = uhood.addProperty(new BigNumber("123").shift(18), owner1Account, "1 Martin Pl, Sydney, Australia", {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
+var listingTx1b = uhood.addProperty(owner1Account, "1 Martin Pl, Sydney, Australia", {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
 }
 failIfTxStatusError(listingTx1b, "listingTx1b");
@@ -341,13 +340,23 @@ failIfTxStatusError(listingTx1b, "listingTx1b");
 printBalances();
 
 console.log("RESULT: uhood.getPropertyData=" + JSON.stringify(uhood.getPropertyData(owner1Account)));
+console.log("RESULT: uhood.tokensToAddNewProperties=" + uhood.tokensToAddNewProperties.call());
+console.log("RESULT: uhood.tokenAddress=" + uhood.tokenAddress.call());
 console.log("RESULT: ");
-
-console.log(uhood.tokensToAddNewProperties.call());
-console.log(uhood.tokenAddress.call());
-console.log(new BigNumber("123").shift(18));
-
 exit;
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 while (txpool.status.pending > 0) {
 }
@@ -703,6 +712,6 @@ console.log("RESULT: ");
 
 EOF
 grep "DATA: " $TEST1OUTPUT | sed "s/DATA: //" > $DEPLOYMENTDATA
-#cat $DEPLOYMENTDATA
+cat $DEPLOYMENTDATA
 grep "RESULT: " $TEST1OUTPUT | sed "s/RESULT: //" > $TEST1RESULTS
-#cat $TEST1RESULTS
+cat $TEST1RESULTS
