@@ -128,7 +128,7 @@ function printTxData(name, txId) {
   var block = eth.getBlock(txReceipt.blockNumber);
   console.log("RESULT: " + name + " status=" + txReceipt.status + (txReceipt.status == 0 ? " Failure" : " Success") + " gas=" + tx.gas +
     " gasUsed=" + txReceipt.gasUsed + " costETH=" + gasCostETH + " costUSD=" + gasCostUSD +
-    " @ ETH/USD=" + ethPriceUSD + " gasPrice=" + web3.fromWei(gasPrice, "gwei") + " gwei block=" + 
+    " @ ETH/USD=" + ethPriceUSD + " gasPrice=" + web3.fromWei(gasPrice, "gwei") + " gwei block=" +
     txReceipt.blockNumber + " txIx=" + tx.transactionIndex + " txId=" + txId +
     " @ " + block.timestamp + " " + new Date(block.timestamp * 1000).toUTCString());
 }
@@ -438,11 +438,11 @@ function printClubContractDetails() {
 
 function getVotingStatus() {
   console.log("RESULT: Votes open = " + club.getVotingStatus(1)[0] +
-    " | Quorum reached = " + club.getVotingStatus(1)[1] + 
-    " | Required majority = " + club.getVotingStatus(1)[2] + 
+    " | Quorum reached = " + club.getVotingStatus(1)[1] +
+    " | Required majority = " + club.getVotingStatus(1)[2] +
     " | Yes percent = " + club.getVotingStatus(1)[3]);
     // " | Total yes votes required = " + club.getVotingStatus(1)[4] +
-    // " | Yes votes = " + club.getVotingStatus(1)[5]);  
+    // " | Yes votes = " + club.getVotingStatus(1)[5]);
 }
 
 // -----------------------------------------------------------------------------
@@ -557,4 +557,44 @@ function generateSummaryJSON() {
     console.log("JSONSUMMARY:   \"finalised\": " + contract.finalised());
   }
   console.log("JSONSUMMARY: }");
+}
+
+// -----------------------------------------------------------------------------
+// Hashing functions
+// -----------------------------------------------------------------------------
+function padLeft0(s, n) {
+  var result = s.toString();
+  while (result.length < n) {
+    result = "0" + result;
+  }
+  return result;
+}
+
+function bytes4ToHex(bytes4) {
+  if (bytes4.substring(0, 2) == "0x") {
+    return padLeft0(bytes4.substring(2, 10), 8);
+  } else {
+    return padLeft0(bytes4.substring(0, 8), 8);
+  }
+}
+
+function addressToHex(address) {
+  if (address.substring(0, 2) == "0x") {
+    return padLeft0(address.substring(2, 42).toLowerCase(), 40);
+  } else {
+    return padLeft0(address.substring(0, 40).toLowerCase(), 40);
+  }
+}
+
+function uint256ToHex(number) {
+  var bigNumber = new BigNumber(number).toString(16);
+  if (bigNumber.substring(0, 2) == "0x") {
+    return padLeft0(bigNumber.substring(2, 66).toLowerCase(), 64);
+  } else {
+    return padLeft0(bigNumber.substring(0, 64).toLowerCase(), 64);
+  }
+}
+
+function stringToHex(s) {
+  return web3.toHex(s).substring(2);
 }

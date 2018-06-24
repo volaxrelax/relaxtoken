@@ -97,7 +97,7 @@ var propertiesLibTx = null;
 var propertiesLibAddress = null;
 var currentBlock = eth.blockNumber;
 var propertiesLibContract = propertiesLibContract.new({from: contractOwnerAccount, data: propertiesLibBin, gas: 6000000, gasPrice: defaultGasPrice},
-  function(e, contract) {    
+  function(e, contract) {
     if (!e) {
       if (!contract.address) {
         propertiesLibTx = contract.transactionHash;
@@ -138,7 +138,7 @@ var token = tokenContract.new(tokenSymbol, tokenName, tokenDecimal, totalSupply,
         tokenTx = contract.transactionHash;
       } else {
         tokenAddress = contract.address;
-        addAccount(tokenAddress, "token");        
+        addAccount(tokenAddress, "token");
         console.log("DATA: tokenAddress=" + tokenAddress);
       }
     }
@@ -324,6 +324,15 @@ printBalances();
 // -----------------------------------------------------------------------------
 var msg = "Owner 1 deposits 100 tokens to add property 1 to the smart contract";
 // -----------------------------------------------------------------------------
+var propertyOwner = owner1Account;
+var propertyLocation = "1  Martin Pl, Sydney, Australia";
+// var hashOf = "0x" + bytes4ToHex(functionSig) + addressToHex(tokenContractAddress) + addressToHex(from) + addressToHex(to) + uint256ToHex(tokens) + uint256ToHex(fee) + uint256ToHex(nonce);
+var propertyHashJS = web3.sha3("0x" + addressToHex(propertyOwner) + stringToHex(propertyLocation), {encoding: "hex"})
+console.log("RESULT: propertyHashJS = " + propertyHashJS);
+
+var propertyHashSol = uhood.getPropertyHash(owner1Account, propertyLocation);
+console.log("RESULT: propertyHashSol = " + propertyHashSol);
+
 console.log("RESULT: ----- " + msg + " -----");
 printBalances();
 
@@ -332,7 +341,7 @@ while (txpool.status.pending > 0) {
 }
 failIfTxStatusError(listingTx1a, "listingTx1a");
 
-var listingTx1b = uhood.addProperty(owner1Account, "1 Martin Pl, Sydney, Australia", {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
+var listingTx1b = uhood.addProperty(propertyOwner, propertyLocation, {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
 }
 failIfTxStatusError(listingTx1b, "listingTx1b");

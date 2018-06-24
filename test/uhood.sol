@@ -353,6 +353,11 @@ contract Uhood is Owned {
         initialised = true;
     }
 
+    function getPropertyHash(address _propertyOwner, string _propertyLocation) public view returns (bytes32) {
+        bytes32 propertyHash = keccak256(abi.encodePacked(_propertyOwner, _propertyLocation));
+        return propertyHash;
+    }
+
     function addProperty(address _propertyOwner, string _propertyLocation) public {
         // TODO: implement approveAndCall
         // require(token.approveAndCall(this, tokensToAddNewProperties, ""));
