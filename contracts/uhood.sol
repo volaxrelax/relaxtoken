@@ -10,7 +10,7 @@
 // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md
 // ----------------------------------------------------------------------------
 
-pragma solidity ^0.4.24;
+pragma solidity 0.4.24;
 
 
 contract ERC20Interface {
@@ -124,14 +124,13 @@ contract Owned {
 contract UhoodToken is UhoodTokenInterface, Owned {
     using SafeMath for uint;
 
-    string _symbol;
-    string _name;
-    uint8 _decimals;
-    uint _totalSupply;
+    string public _symbol;
+    string public _name;
+    uint8 public _decimals;
+    uint public _totalSupply;
 
-    mapping(address => uint) balances;
-    mapping(address => mapping(address => uint)) allowed;
-
+    mapping(address => uint) public balances;
+    mapping(address => mapping(address => uint)) public allowed;
 
     constructor(string symbol, string name, uint8 decimals, uint totalSupply) public {
         _symbol = symbol;
@@ -141,32 +140,44 @@ contract UhoodToken is UhoodTokenInterface, Owned {
         balances[msg.sender] = totalSupply;
         emit Transfer(address(0), msg.sender, totalSupply);
     }
+
+    function () public payable {
+        revert();
+    }
+
     function symbol() public view returns (string) {
         return _symbol;
     }
+
     function name() public view returns (string) {
         return _name;
     }
+
     function decimals() public view returns (uint8) {
         return _decimals;
     }
+
     function totalSupply() public constant returns (uint) {
-        return _totalSupply  - balances[address(0)];
+        return _totalSupply - balances[address(0)];
     }
+
     function balanceOf(address tokenOwner) public constant returns (uint balance) {
         return balances[tokenOwner];
     }
+
     function transfer(address to, uint tokens) public returns (bool success) {
         balances[msg.sender] = balances[msg.sender].sub(tokens);
         balances[to] = balances[to].add(tokens);
         emit Transfer(msg.sender, to, tokens);
         return true;
     }
+
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
         emit Approval(msg.sender, spender, tokens);
         return true;
     }
+
     function transferFrom(address from, address to, uint tokens) public returns (bool success) {
         balances[from] = balances[from].sub(tokens);
         allowed[from][msg.sender] = allowed[from][msg.sender].sub(tokens);
@@ -174,9 +185,11 @@ contract UhoodToken is UhoodTokenInterface, Owned {
         emit Transfer(from, to, tokens);
         return true;
     }
+
     function allowance(address tokenOwner, address spender) public constant returns (uint remaining) {
         return allowed[tokenOwner][spender];
     }
+
     function approveAndCall(address spender, uint tokens, bytes data) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
         emit Approval(msg.sender, spender, tokens);
@@ -189,6 +202,7 @@ contract UhoodToken is UhoodTokenInterface, Owned {
     //     emit Transfer(address(0), tokenOwner, tokens);
     //     return true;
     // }
+
     function burn(address tokenOwner, uint tokens) public onlyOwner returns (bool success) {
         if (tokens > balances[tokenOwner]) {
             tokens = balances[tokenOwner];
@@ -198,9 +212,7 @@ contract UhoodToken is UhoodTokenInterface, Owned {
         emit Transfer(tokenOwner, address(0), tokens);
         return true;
     }
-    function () public payable {
-        revert();
-    }
+
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
@@ -211,9 +223,8 @@ contract UhoodToken is UhoodTokenInterface, Owned {
 // Property Data Structure
 // ----------------------------------------------------------------------------
 library Properties {
-
     struct Property {
-        bool exists;        
+        bool exists;
         uint index;
         address owner;
         string location;
@@ -236,7 +247,8 @@ library Properties {
         self.initialised = true;
     }
 
-    function isPropertyOwner(Data storage self, address ownerAddress, string propertyLocation) public view returns (bool) {
+    function isPropertyOwner(Data storage self, address ownerAddress,
+        string propertyLocation) public view returns (bool) {
 
         bytes32 propertyHash = keccak256(abi.encodePacked(ownerAddress, propertyLocation));
 
@@ -249,7 +261,7 @@ library Properties {
 
         require(!self.entries[propertyHash].exists);
         require(ownerAddress != 0x0);
-        require(bytes(propertyLocation).length > 0);        
+        require(bytes(propertyLocation).length > 0);
 
         self.index.push(propertyHash);
         self.entries[propertyHash] = Property(true, self.index.length - 1, ownerAddress, propertyLocation);
@@ -275,21 +287,20 @@ library Properties {
     }
 
     // TODO: implement a setOwner function by calling remove and then add
-    // function setOwner(Data storage self, address ownerAddress, string propertyLocation, address newOwnerAddress) public {
-
-    //     bytes32 propertyHash = keccak256(abi.encodePacked(ownerAddress, propertyLocation));        
+    // function setOwner(Data storage self, address ownerAddress,
+    // string propertyLocation, address newOwnerAddress) public {
+    //     bytes32 propertyHash = keccak256(abi.encodePacked(ownerAddress, propertyLocation));
     //     Property storage property = self.entries[ownerAddress];
     //     require(property.exists);
     //     emit propertyLocationUpdated(ownerAddress, property.location, propertyLocation);
     //     property.location = propertyLocation;
-
     // }
-
     function length(Data storage self) public view returns (uint) {
         return self.index.length;
     }
 
 }
+
 
 // ----------------------------------------------------------------------------
 // Uhood
@@ -302,8 +313,8 @@ contract Uhood is Owned {
 
     // string public name;
 
-    UhoodTokenInterface public token;    
-    Properties.Data properties;
+    UhoodTokenInterface public token;
+    Properties.Data public properties;
     // Proposals.Data public proposals;
     bool public initialised;
 
@@ -312,60 +323,49 @@ contract Uhood is Owned {
     // uint public tokensGivenToNewUser = 500;
     mapping(address => mapping(address => uint)) public balances;
 
-
     // uint public quorum = 80;
     // uint public quorumDecayPerWeek = 10;
     // uint public requiredMajority = 70;
-
 
     // Must be copied here to be added to the ABI
     event PropertyAdded(address indexed ownerAddress, string name, uint totalAfter);
     event PropertyRemoved(address indexed ownerAddress, string name, uint totalAfter);
     event PropertyNameUpdated(address indexed ownerAddress, string oldName, string newName);
     event TokensDeposited(address depositor, address tokenAddress, uint tokens, uint balanceAfter);
-
-    // event NewProposal(uint indexed proposalId, Proposals.ProposalType indexed proposalType, address indexed proposer);
-    // event Voted(uint indexed proposalId, address indexed voter, bool vote, uint votedYes, uint votedNo);
-    // event VoteResult(uint indexed proposalId, bool pass, uint votes, uint quorumPercent, uint PropertiesLength, uint yesPercent, uint requiredMajority);
-    // event TokenUpdated(address indexed oldToken, address indexed newToken);
-    event tokensToAddNewPropertiesUpdated(uint oldTokens, uint newTokens);
+    event TokensToAddNewPropertiesUpdated(uint oldTokens, uint newTokens);
     // event EtherDeposited(address indexed sender, uint amount);
     // event EtherTransferred(uint indexed proposalId, address indexed sender, address indexed recipient, uint amount);
 
-
-    modifier onlyPropertyOwner (string propertyLocation) {
-        require(properties.isPropertyOwner(msg.sender, propertyLocation));
+    modifier onlyPropertyOwner (string _propertyLocation) {
+        require(properties.isPropertyOwner(msg.sender, _propertyLocation));
         _;
     }
 
-    constructor(address uhoodToken, uint _tokensToAddNewProperties) public {
+    constructor(address _uhoodToken, uint _tokensToAddNewProperties) public {
         properties.init();
-        token = UhoodTokenInterface(uhoodToken);
-        tokenAddress = uhoodToken;
+        token = UhoodTokenInterface(_uhoodToken);
+        tokenAddress = _uhoodToken;
         tokensToAddNewProperties = _tokensToAddNewProperties;
     }
 
     function init() public {
         require(!initialised);
-        initialised = true;        
+        initialised = true;
     }
 
-    function addProperty(address propertyOwner, string propertyLocation) public {
-
+    function addProperty(address _propertyOwner, string _propertyLocation) public {
         // TODO: implement approveAndCall
         // require(token.approveAndCall(this, tokensToAddNewProperties, ""));
-       
         require(token.transferFrom(msg.sender, this, tokensToAddNewProperties));
         balances[tokenAddress][msg.sender] = balances[tokenAddress][msg.sender].add(tokensToAddNewProperties);
         emit TokensDeposited(msg.sender, tokenAddress, tokensToAddNewProperties, balances[tokenAddress][msg.sender]);
-        properties.add(propertyOwner, propertyLocation);
+        properties.add(_propertyOwner, _propertyLocation);
 
     }
 
     // function setPropertyLocation(string propertyLocation) public {
     //     properties.setLocation(msg.sender, propertyLocation);
     // }
-
     function numberOfProperties() public view returns (uint) {
         return properties.length();
     }
@@ -374,19 +374,19 @@ contract Uhood is Owned {
         return properties.index;
     }
 
-    function getPropertyData(address ownerAddress, string propertyLocation) public view returns (bool _exists, uint _index, string _name) {
-
-        bytes32 propertyHash = keccak256(abi.encodePacked(ownerAddress, propertyLocation));
-
-        Properties.Property memory Property = properties.entries[propertyHash];
-        return (Property.exists, Property.index, Property.location);
-
+    function getPropertyData(
+        address _ownerAddress,
+        string _propertyLocation
+    )
+        public view returns (bool _exists, uint _index, string _name)
+    {
+        bytes32 propertyHash = keccak256(abi.encodePacked(_ownerAddress, _propertyLocation));
+        Properties.Property memory property = properties.entries[propertyHash];
+        return (property.exists, property.index, property.location);
     }
 
-    function getPropertyByIndex(uint _index) public view returns (bytes32 _Property) {
-
+    function getPropertyByIndex(uint _index) public view returns (bytes32 property) {
         return properties.index[_index];
-
     }
 
 }
