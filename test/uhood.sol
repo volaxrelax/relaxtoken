@@ -223,11 +223,38 @@ contract UhoodToken is UhoodTokenInterface, Owned {
 // Property Data Structure
 // ----------------------------------------------------------------------------
 library Properties {
+    enum PropertyType {
+        House,                         //  0 House
+        ApartmentAndUnit,              //  1 Apartment and unit
+        Townhouse,                     //  2 Townhouse
+        Villa,                         //  3 Villa
+        Acreage,                       //  4 Acreage
+        BlockOfUnits,                  //  5 Block of units
+        RetirementLiving               //  6 Retirement living
+    }
+
+    // The number of bedrooms, bathrooms, garage spaces
+    enum NumberOf {
+        Zero,                          //  0
+        One,                           //  1 One
+        Two,                           //  2 Two
+        Three,                         //  3 Three
+        Four,                          //  4 Four
+        Five,                          //  5 Five
+        SixOrMore                      //  6 Six or more
+    }
+
     struct Property {
         bool exists;
         uint index;
         address owner;
         string location;
+        PropertyType propertyType;
+        NumberOf bedrooms;
+        NumberOf bathrooms;
+        NumberOf garageSapces;
+        string comments;
+        uint nextAvailableDate;
     }
 
     struct Data {
@@ -238,8 +265,8 @@ library Properties {
         bytes32[] index;
     }
 
-    event PropertyAdded(address indexed ownerAddress, string location, uint totalAfter);
-    event PropertyRemoved(address indexed ownerAddress, string location, uint totalAfter);
+    event PropertyAdded(bytes32 propertyHash, address indexed ownerAddress, string location, uint totalAfter);
+    event PropertyRemoved(bytes32 propertyHash, address indexed ownerAddress, string location, uint totalAfter);
     // event propertyLocationUpdated(address indexed ownerAddress, string oldLocation, string newLocation);
 
     function init(Data storage self) public {
@@ -249,32 +276,42 @@ library Properties {
 
     function isPropertyOwner(Data storage self, address ownerAddress,
         string propertyLocation) public view returns (bool) {
-
         bytes32 propertyHash = keccak256(abi.encodePacked(ownerAddress, propertyLocation));
-
-        return self.entries[propertyHash].exists;
+        return (self.entries[propertyHash].exists && self.entries[propertyHash].owner == ownerAddress);
     }
 
-    function add(Data storage self, address ownerAddress, string propertyLocation) public {
-
-        bytes32 propertyHash = keccak256(abi.encodePacked(ownerAddress, propertyLocation));
+    function add(
+        Data storage self,
+        address _ownerAddress,
+        string _propertyLocation,
+        PropertyType _propertyType,
+        NumberOf _bedrooms,
+        NumberOf _bathrooms,
+        NumberOf _garageSpaces,
+        string _comments,
+        uint _nextAvailableDate)
+        public
+    {
+        bytes32 propertyHash = keccak256(abi.encodePacked(_ownerAddress, _propertyLocation));
 
         require(!self.entries[propertyHash].exists);
-        require(ownerAddress != 0x0);
-        require(bytes(propertyLocation).length > 0);
+        require(_ownerAddress != 0x0);
+        require(bytes(_propertyLocation).length > 0);
 
         self.index.push(propertyHash);
-        self.entries[propertyHash] = Property(true, self.index.length - 1, ownerAddress, propertyLocation);
-        emit PropertyAdded(ownerAddress, propertyLocation, self.index.length);
+        self.entries[propertyHash] = Property(true, self.index.length - 1,
+                                            _ownerAddress, _propertyLocation, _propertyType, _bedrooms,
+                                            _bathrooms, _garageSpaces, _comments, _nextAvailableDate);
+        emit PropertyAdded(propertyHash, _ownerAddress, _propertyLocation, self.index.length);
     }
 
-    function remove(Data storage self, address ownerAddress, string propertyLocation) public {
+    function remove(Data storage self, address _ownerAddress, string _propertyLocation) public {
 
-        bytes32 propertyHash = keccak256(abi.encodePacked(ownerAddress, propertyLocation));
+        bytes32 propertyHash = keccak256(abi.encodePacked(_ownerAddress, _propertyLocation));
 
         require(self.entries[propertyHash].exists);
         uint removeIndex = self.entries[propertyHash].index;
-        emit PropertyRemoved(ownerAddress, self.entries[propertyHash].location, self.index.length - 1);
+        emit PropertyRemoved(propertyHash, _ownerAddress, _propertyLocation, self.index.length - 1);
         uint lastIndex = self.index.length - 1;
         bytes32 lastIndexAddress = self.index[lastIndex];
         self.index[removeIndex] = lastIndexAddress;
@@ -353,19 +390,29 @@ contract Uhood is Owned {
         initialised = true;
     }
 
-    function getPropertyHash(address _propertyOwner, string _propertyLocation) public view returns (bytes32) {
+    function getPropertyHash(address _propertyOwner, string _propertyLocation) public pure returns (bytes32) {
         bytes32 propertyHash = keccak256(abi.encodePacked(_propertyOwner, _propertyLocation));
         return propertyHash;
     }
 
-    function addProperty(address _propertyOwner, string _propertyLocation) public {
+    function addProperty(
+        address _propertyOwner,
+        string _propertyLocation,
+        Properties.PropertyType _propertyType,
+        Properties.NumberOf _bedrooms,
+        Properties.NumberOf _bathrooms,
+        Properties.NumberOf _garageSpaces,
+        string _comments,
+        uint _nextAvailableDate)
+        public
+    {
         // TODO: implement approveAndCall
         // require(token.approveAndCall(this, tokensToAddNewProperties, ""));
         require(token.transferFrom(msg.sender, this, tokensToAddNewProperties));
         balances[tokenAddress][msg.sender] = balances[tokenAddress][msg.sender].add(tokensToAddNewProperties);
         emit TokensDeposited(msg.sender, tokenAddress, tokensToAddNewProperties, balances[tokenAddress][msg.sender]);
-        properties.add(_propertyOwner, _propertyLocation);
-
+        properties.add(_propertyOwner, _propertyLocation, _propertyType,
+                        _bedrooms, _bathrooms, _garageSpaces, _comments, _nextAvailableDate);
     }
 
     // function setPropertyLocation(string propertyLocation) public {
@@ -383,11 +430,24 @@ contract Uhood is Owned {
         address _ownerAddress,
         string _propertyLocation
     )
-        public view returns (bool _exists, uint _index, string _name)
+        public
+        view
+        returns (
+            bool exists,
+            uint index,
+            string name,
+            Properties.PropertyType propertyType,
+            Properties.NumberOf bedrooms,
+            Properties.NumberOf bathrooms,
+            Properties.NumberOf garageSpaces,
+            string comments,
+            uint nextAvailableDate)
     {
         bytes32 propertyHash = keccak256(abi.encodePacked(_ownerAddress, _propertyLocation));
         Properties.Property memory property = properties.entries[propertyHash];
-        return (property.exists, property.index, property.location);
+        return (property.exists, property.index, property.location, property.propertyType,
+                property.bedrooms, property.bathrooms, property.garageSapces, property.comments,
+                property.nextAvailableDate);
     }
 
     function getPropertyByIndex(uint _index) public view returns (bytes32 property) {

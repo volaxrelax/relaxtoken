@@ -598,3 +598,10 @@ function uint256ToHex(number) {
 function stringToHex(s) {
   return web3.toHex(s).substring(2);
 }
+
+// timestamp to string
+function timestampToStr(timestamp) {
+  timestamp1 = new Date(timestamp*1000);
+  dateStr = timestamp1.toLocaleString();
+  return dateStr;
+}

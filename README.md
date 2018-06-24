@@ -13,18 +13,18 @@ The official Github repo of Uhood Chain
 - [x] Admin (invite only)
 - [x] Property owner 1, 2 (200 each)
 - [x] Renter 1, 2 (10000 each)
-- [ ] Owner 1 lists property, send 100 token to the uhood smart contract, eth address, available after date, property location (can't be updated), property type (appartment, townhouse, house), layout(bedroom count, toilet count, garage count)
+- [x] Owner 1 lists property, send 100 token to the uhood smart contract, eth address, next available date, property location (can't be updated), property type (appartment, townhouse, house), layout(bedroom count, toilet count, garage count)
 - [ ] Admin approve listing (admin is a committee voted by all users)
-- [ ] Can get all the info
+- [x] Can get all the info
 - [ ] Only owner can update the info
 - [ ] Owner 1 transfers ownership to owner 2
 - [ ] Owner 2 can update the info
-- [ ] Owner and admin can delist 
+- [ ] Owner and admin can delist
 
 ## Application
 - [ ] Renter 1,2
 - [ ] Owner 1
-- [ ] Renter 1 starts application form, provide offer price, applicant information (number of applicant, name, licence no., DOB), employment information (current job title, current employer, annual salary, reference contact, previous job title, previous employer, previous annual salary), rental history information (current rental address, current agency, current agency contact,current rental price, reason to leave, previous rental address, previous agency, previous agency contact) 
+- [ ] Renter 1 starts application form, provide offer price, applicant information (number of applicant, name, licence no., DOB), employment information (current job title, current employer, annual salary, reference contact, previous job title, previous employer, previous annual salary), rental history information (current rental address, current agency, current agency contact,current rental price, reason to leave, previous rental address, previous agency, previous agency contact)
 - [ ] Renter 1's application information (Avatar name 'renter 1', offer price, entry date) will be updated to the listing (visible to public)
 - [ ] Renter 2 starts application form, provide offer price, applicant information
 - [ ] Renter 2's application information (Avatar name 'renter 1', offer price, entry date) will be updated to the listing (visible to public)
@@ -33,4 +33,3 @@ The official Github repo of Uhood Chain
 - [ ] Renter 1 and 2 can withdraw applications before Owner 1 makes a decision
 
 ##  
-

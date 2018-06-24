@@ -325,7 +325,15 @@ printBalances();
 var msg = "Owner 1 deposits 100 tokens to add property 1 to the smart contract";
 // -----------------------------------------------------------------------------
 var propertyOwner = owner1Account;
-var propertyLocation = "1  Martin Pl, Sydney, Australia";
+var propertyLocation = "96/71 Victoria Street, Potts Point NSW 2011";
+var propertyType = 1; // apartment
+var bedrooms = 3;
+var bathrooms = 2;
+var garageSpaces = 1;
+var comments = "city and harbour view";
+var nextAvailableDate = $START_DATE;
+
+console.log("RESULTS: nextAvailableDate = " + nextAvailableDate);
 // var hashOf = "0x" + bytes4ToHex(functionSig) + addressToHex(tokenContractAddress) + addressToHex(from) + addressToHex(to) + uint256ToHex(tokens) + uint256ToHex(fee) + uint256ToHex(nonce);
 var propertyHashJS = web3.sha3("0x" + addressToHex(propertyOwner) + stringToHex(propertyLocation), {encoding: "hex"})
 console.log("RESULT: propertyHashJS = " + propertyHashJS);
@@ -341,14 +349,18 @@ while (txpool.status.pending > 0) {
 }
 failIfTxStatusError(listingTx1a, "listingTx1a");
 
-var listingTx1b = uhood.addProperty(propertyOwner, propertyLocation, {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
+var listingTx1b = uhood.addProperty(propertyOwner, propertyLocation, propertyType, bedrooms, bathrooms, garageSpaces, comments, nextAvailableDate, {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
 }
 failIfTxStatusError(listingTx1b, "listingTx1b");
 
 printBalances();
 
-console.log("RESULT: uhood.getPropertyData=" + JSON.stringify(uhood.getPropertyData(owner1Account, "1 Martin Pl, Sydney, Australia")));
+var propertyData = uhood.getPropertyData(owner1Account, "96/71 Victoria Street, Potts Point NSW 2011")
+var nextAvailableDateStr = timestampToStr(propertyData[8]);
+
+console.log("RESULT: uhood.getPropertyData=" + JSON.stringify(propertyData));
+console.log("RESULT: nextAvailableDateStr = " + nextAvailableDateStr);
 console.log("RESULT: uhood.tokensToAddNewProperties=" + uhood.tokensToAddNewProperties.call());
 console.log("RESULT: uhood.tokenAddress=" + uhood.tokenAddress.call());
 console.log("RESULT: ");
