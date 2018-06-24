@@ -333,6 +333,9 @@ var garageSpaces = 1;
 var comments = "city and harbour view";
 var nextAvailableDate = $START_DATE;
 
+console.log("RESULT: ----- " + msg + " -----");
+printBalances();
+
 console.log("RESULTS: nextAvailableDate = " + nextAvailableDate);
 // var hashOf = "0x" + bytes4ToHex(functionSig) + addressToHex(tokenContractAddress) + addressToHex(from) + addressToHex(to) + uint256ToHex(tokens) + uint256ToHex(fee) + uint256ToHex(nonce);
 var propertyHashJS = web3.sha3("0x" + addressToHex(propertyOwner) + stringToHex(propertyLocation), {encoding: "hex"})
@@ -340,9 +343,6 @@ console.log("RESULT: propertyHashJS = " + propertyHashJS);
 
 var propertyHashSol = uhood.getPropertyHash(owner1Account, propertyLocation);
 console.log("RESULT: propertyHashSol = " + propertyHashSol);
-
-console.log("RESULT: ----- " + msg + " -----");
-printBalances();
 
 var listingTx1a = token.approve(uhoodAddress, new BigNumber("200").shift(18), {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
@@ -359,11 +359,57 @@ printBalances();
 var propertyData = uhood.getPropertyData(owner1Account, "96/71 Victoria Street, Potts Point NSW 2011")
 var nextAvailableDateStr = timestampToStr(propertyData[8]);
 
+printTxData("listingTx1a", listingTx1a);
+printTxData("listingTx1b", listingTx1b);
 console.log("RESULT: uhood.getPropertyData=" + JSON.stringify(propertyData));
 console.log("RESULT: nextAvailableDateStr = " + nextAvailableDateStr);
 console.log("RESULT: uhood.tokensToAddNewProperties=" + uhood.tokensToAddNewProperties.call());
 console.log("RESULT: uhood.tokenAddress=" + uhood.tokenAddress.call());
 console.log("RESULT: ");
+
+
+// -----------------------------------------------------------------------------
+var msg = "Owner 1 updates next available date";
+// -----------------------------------------------------------------------------
+console.log("RESULT: ----- " + msg + " -----");
+
+var listingTx2 = uhood.updateNextAvailableDate(propertyOwner, propertyLocation, $END_DATE, {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
+while (txpool.status.pending > 0) {
+}
+failIfTxStatusError(listingTx2, "listingTx2");
+
+printBalances();
+
+var propertyData = uhood.getPropertyData(owner1Account, "96/71 Victoria Street, Potts Point NSW 2011")
+var nextAvailableDateStr = timestampToStr(propertyData[8]);
+
+printTxData("listingTx2", listingTx2);
+console.log("RESULT: uhood.getPropertyData=" + JSON.stringify(propertyData));
+console.log("RESULT: nextAvailableDateStr = " + nextAvailableDateStr);
+console.log("RESULT: ");
+
+exit;
+
+
+// -----------------------------------------------------------------------------
+var msg = "Owner 1 removes the property";
+// -----------------------------------------------------------------------------
+console.log("RESULT: ----- " + msg + " -----");
+
+var listingTx2 = uhood.removeProperty(propertyOwner, propertyLocation, {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
+while (txpool.status.pending > 0) {
+}
+failIfTxStatusError(listingTx2, "listingTx2");
+
+printBalances();
+
+var propertyData = uhood.getPropertyData(owner1Account, "96/71 Victoria Street, Potts Point NSW 2011")
+var nextAvailableDateStr = timestampToStr(propertyData[8]);
+
+console.log("RESULT: uhood.getPropertyData=" + JSON.stringify(propertyData));
+console.log("RESULT: nextAvailableDateStr = " + nextAvailableDateStr);
+console.log("RESULT: ");
+
 exit;
 
 

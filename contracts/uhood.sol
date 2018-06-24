@@ -235,7 +235,7 @@ library Properties {
 
     // The number of bedrooms, bathrooms, garage spaces
     enum NumberOf {
-        Zero,                          //  0
+        Zero,                          //  0 Zero
         One,                           //  1 One
         Two,                           //  2 Two
         Three,                         //  3 Three
@@ -413,6 +413,39 @@ contract Uhood is Owned {
         emit TokensDeposited(msg.sender, tokenAddress, tokensToAddNewProperties, balances[tokenAddress][msg.sender]);
         properties.add(_propertyOwner, _propertyLocation, _propertyType,
                         _bedrooms, _bathrooms, _garageSpaces, _comments, _nextAvailableDate);
+    }
+
+    function removeProperty(
+        address _propertyOwner,
+        string _propertyLocation)
+        public
+        onlyPropertyOwner(_propertyLocation)
+    {
+        properties.remove(_propertyOwner, _propertyLocation);
+    }
+
+    function transferProperty(
+        address _propertyOwner,
+        string _propertyLocation)
+        public
+        onlyPropertyOwner(_propertyLocation)
+    { // solhint-disable-line
+
+        // TODO: Implementation
+
+    }
+
+    function updateNextAvailableDate(
+        address _propertyOwner,
+        string _propertyLocation,
+        uint _nextAvailableDate)
+        public
+        onlyPropertyOwner(_propertyLocation)
+    {
+        require(_nextAvailableDate > 0);
+        bytes32 propertyHash = keccak256(abi.encodePacked(_propertyOwner, _propertyLocation));
+        Properties.Property memory property = properties.entries[propertyHash];
+        property.nextAvailableDate = _nextAvailableDate;
     }
 
     // function setPropertyLocation(string propertyLocation) public {
