@@ -19,7 +19,7 @@ The official Github repo of Uhood Chain
 - [x] Only owner can update the info
 - [x] Owner and delist the property
 
-## Application
+## Application [Implement these in front end/ centralised database only, not block chain]
 - [ ] Renter 1,2
 - [ ] Owner 1
 - [ ] Renter 1 starts application form, provide offer price, applicant information (number of applicant, name, licence no., DOB), employment information (current job title, current employer, annual salary, reference contact, previous job title, previous employer, previous annual salary), rental history information (current rental address, current agency, current agency contact,current rental price, reason to leave, previous rental address, previous agency, previous agency contact)
@@ -30,4 +30,12 @@ The official Github repo of Uhood Chain
 - [ ] Renter 1(the application winner) receives a confirmation
 - [ ] Renter 1 and 2 can withdraw applications before Owner 1 makes a decision
 
-##  
+##  Rental agreement issuance and exchange - ERC809 (721 compatible) https://github.com/ethereum/EIPs/issues/809
+- [ ] Build ERC 809 token to represent rental agreements. It contains: property hash (mapped to listed properties), start date, end date, agreed rent, bond, rent payment frequency, inspection frequency, sublease rights
+- [ ] Only property owner can issue ERC 809 tokens.
+- [ ] For each property, the associated ERC 809 tokens cannot have overlapping time periods.
+- [ ] Token holders can transfer ERC 809 tokens to a new tenant who takes over the remaining term
+
+## Resources
+https://github.com/saurfang/erc809-billboard
+https://github.com/ethereum/EIPs/issues/809
