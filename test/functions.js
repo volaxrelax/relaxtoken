@@ -605,3 +605,65 @@ function timestampToStr(timestamp) {
   dateStr = timestamp1.toLocaleString();
   return dateStr;
 }
+
+function printPropertyType(n) {
+    switch (parseInt(n, 10)) {
+      case 0:
+          propertyType = "House";
+          break;
+      case 1:
+          propertyType = "Apartment and unit";
+          break;
+      case 2:
+          propertyType = "Townhouse";
+          break;
+      case 3:
+          propertyType = "Villa";
+          break;
+      case 4:
+          propertyType = "Acreage";
+          break;
+      case 5:
+          propertyType = "Block of units";
+          break;
+      case 6:
+          propertyType = "Retirement living";
+    }
+    return propertyType;
+}
+
+// -----------------------------------------------------------------------------
+// Uhood Contract
+// -----------------------------------------------------------------------------
+var uhoodAddress = null;
+var uhoodAbi = null;
+var uhoodFromBlock = 0;
+
+function printUhoodContractDetails() {
+  // console.log("RESULT: uhoodAddress=" + uhoodAddress);
+  if (uhoodAddress != null && uhoodAbi != null) {
+    var uhood = eth.contract(uhoodAbi).at(uhoodAddress);
+    // console.log("RESULT: uhood.tokensToAddNewProperties=" + uhood.tokensToAddNewProperties());
+    // console.log("RESULT: uhood.tokenAddress=" + uhood.tokenAddress());
+    var i;
+    for (i = 0; i < uhood.numberOfProperties(); i++) {
+      var property = uhood.getPropertyByIndex(i);
+      var data = uhood.getPropertyData(property);
+      console.log("RESULT: uhood.properties[" + i + "]=" + property + " [" + data[0] + ", "  + data[1] + ", '" +
+        data[2] + "', '" + data[3] + "', '" + printPropertyType(data[4]) + "', " + data[5] + ", " + data[6] + ", " + data[7] + ", '" +
+        data[8]  + "', '" + timestampToStr(data[9]) + "']");
+    }
+
+    var latestBlock = eth.blockNumber;
+
+    // var newPropertyEvents = uhood.PropertyAdded({}, { fromBlock: uhoodFromBlock, toBlock: latestBlock });
+    // i = 0;
+    // newPropertyEvents.watch(function (error, result) {
+    //   console.log("RESULT: PropertyAdded " + i++ + " #" + result.blockNumber + " " + JSON.stringify(result.args));
+    //   var property = uhood.getPropertyData(result.args., );
+    //   console.log("RESULT: - proposal=" + JSON.stringify(proposal));
+    // });
+    // newProposalEvents.stopWatching();
+    // clubFromBlock = latestBlock + 1;
+  }
+}

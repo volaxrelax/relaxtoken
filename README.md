@@ -15,7 +15,7 @@ The official Github repo of Uhood Chain
 - [x] Renter 1, 2 (10000 each)
 - [x] Owner 1 lists property, send 100 token to the uhood smart contract, eth address, next available date, property location (can't be updated), property type (appartment, townhouse, house), layout(bedroom count, toilet count, garage count)
 - [x] Can get all the info
-- [ ] Can update next available date
+- [x] Onwer can update the next available date
 - [ ] Admin approve listing (admin is a committee voted by all users)
 - [ ] Only owner can update the info
 - [ ] Owner 1 transfers ownership to owner 2

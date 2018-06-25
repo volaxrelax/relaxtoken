@@ -324,8 +324,8 @@ printBalances();
 // -----------------------------------------------------------------------------
 var msg = "Owner 1 deposits 100 tokens to add property 1 to the smart contract";
 // -----------------------------------------------------------------------------
-var propertyOwner = owner1Account;
-var propertyLocation = "96/71 Victoria Street, Potts Point NSW 2011";
+var propertyOwner1 = owner1Account;
+var propertyLocation1 = "96/71 Victoria Street, Potts Point NSW 2011";
 var propertyType = 1; // apartment
 var bedrooms = 3;
 var bathrooms = 2;
@@ -334,37 +334,36 @@ var comments = "city and harbour view";
 var nextAvailableDate = $START_DATE;
 
 console.log("RESULT: ----- " + msg + " -----");
-printBalances();
+// printBalances();
 
 console.log("RESULTS: nextAvailableDate = " + nextAvailableDate);
 // var hashOf = "0x" + bytes4ToHex(functionSig) + addressToHex(tokenContractAddress) + addressToHex(from) + addressToHex(to) + uint256ToHex(tokens) + uint256ToHex(fee) + uint256ToHex(nonce);
-var propertyHashJS = web3.sha3("0x" + addressToHex(propertyOwner) + stringToHex(propertyLocation), {encoding: "hex"})
-console.log("RESULT: propertyHashJS = " + propertyHashJS);
+var propertyHashJS1 = web3.sha3("0x" + addressToHex(propertyOwner1) + stringToHex(propertyLocation1), {encoding: "hex"})
+console.log("RESULT: propertyHashJS1 = " + propertyHashJS1);
 
-var propertyHashSol = uhood.getPropertyHash(owner1Account, propertyLocation);
-console.log("RESULT: propertyHashSol = " + propertyHashSol);
+var propertyHashSol1 = uhood.getPropertyHash(propertyOwner1, propertyLocation1);
+console.log("RESULT: propertyHashSol1 = " + propertyHashSol1);
 
 var listingTx1a = token.approve(uhoodAddress, new BigNumber("200").shift(18), {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
 }
 failIfTxStatusError(listingTx1a, "listingTx1a");
 
-var listingTx1b = uhood.addProperty(propertyOwner, propertyLocation, propertyType, bedrooms, bathrooms, garageSpaces, comments, nextAvailableDate, {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
+var listingTx1b = uhood.addProperty(propertyOwner1, propertyLocation1, propertyType, bedrooms, bathrooms, garageSpaces, comments, nextAvailableDate, {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
 }
 failIfTxStatusError(listingTx1b, "listingTx1b");
 
 printBalances();
 
-var propertyData = uhood.getPropertyData(owner1Account, "96/71 Victoria Street, Potts Point NSW 2011")
-var nextAvailableDateStr = timestampToStr(propertyData[8]);
+// var propertyData = uhood.getPropertyData(owner1Account, "96/71 Victoria Street, Potts Point NSW 2011")
+var propertyData = uhood.getPropertyData(propertyHashJS1);
+var nextAvailableDateStr = timestampToStr(propertyData[9]);
 
 printTxData("listingTx1a", listingTx1a);
 printTxData("listingTx1b", listingTx1b);
-console.log("RESULT: uhood.getPropertyData=" + JSON.stringify(propertyData));
-console.log("RESULT: nextAvailableDateStr = " + nextAvailableDateStr);
-console.log("RESULT: uhood.tokensToAddNewProperties=" + uhood.tokensToAddNewProperties.call());
-console.log("RESULT: uhood.tokenAddress=" + uhood.tokenAddress.call());
+console.log("RESULT: uhood.getPropertyData = " + JSON.stringify(propertyData));
+printUhoodContractDetails();
 console.log("RESULT: ");
 
 
@@ -373,42 +372,94 @@ var msg = "Owner 1 updates next available date";
 // -----------------------------------------------------------------------------
 console.log("RESULT: ----- " + msg + " -----");
 
-var listingTx2 = uhood.updateNextAvailableDate(propertyOwner, propertyLocation, $END_DATE, {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
+var now = Date.now();
+var future = parseInt(now/1000) + (30*24*60*60);
+console.log("RESULT: future = " + timestampToStr(future));
+
+var listingTx2 = uhood.updateNextAvailableDate(propertyHashJS1, future, {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
 }
 failIfTxStatusError(listingTx2, "listingTx2");
 
 printBalances();
 
-var propertyData = uhood.getPropertyData(owner1Account, "96/71 Victoria Street, Potts Point NSW 2011")
-var nextAvailableDateStr = timestampToStr(propertyData[8]);
+var propertyData = uhood.getPropertyData(propertyHashJS);
+var nextAvailableDateStr = timestampToStr(propertyData[9]);
 
 printTxData("listingTx2", listingTx2);
-console.log("RESULT: uhood.getPropertyData=" + JSON.stringify(propertyData));
-console.log("RESULT: nextAvailableDateStr = " + nextAvailableDateStr);
+printUhoodContractDetails();
 console.log("RESULT: ");
-
-exit;
 
 
 // -----------------------------------------------------------------------------
-var msg = "Owner 1 removes the property";
+var msg = "Owner 2 deposits 100 tokens to add property 2 to the smart contract";
+// -----------------------------------------------------------------------------
+var propertyOwner2 = owner2Account;
+var propertyLocation2 = "136 Raglan Street, Mosman NSW 2088";
+var propertyType = 0; // apartment
+var bedrooms = 5;
+var bathrooms = 3;
+var garageSpaces = 2;
+var comments = "Swimming Pool - Inground";
+var now = Date.now();
+var future = parseInt(now/1000) + (90*24*60*60);
+var nextAvailableDate = future;
+
+console.log("RESULT: ----- " + msg + " -----");
+printBalances();
+
+console.log("RESULTS: nextAvailableDate = " + nextAvailableDate);
+// var hashOf = "0x" + bytes4ToHex(functionSig) + addressToHex(tokenContractAddress) + addressToHex(from) + addressToHex(to) + uint256ToHex(tokens) + uint256ToHex(fee) + uint256ToHex(nonce);
+var propertyHashJS2 = web3.sha3("0x" + addressToHex(propertyOwner2) + stringToHex(propertyLocation2), {encoding: "hex"})
+console.log("RESULT: propertyHashJS = " + propertyHashJS2);
+
+var propertyHashSol2 = uhood.getPropertyHash(propertyOwner2, propertyLocation2);
+console.log("RESULT: propertyHashSol = " + propertyHashSol2);
+
+var listingTx3a = token.approve(uhoodAddress, new BigNumber("200").shift(18), {from: owner2Account, gas: 500000, gasPrice: defaultGasPrice});
+while (txpool.status.pending > 0) {
+}
+failIfTxStatusError(listingTx3a, "listingTx3");
+
+var listingTx3b = uhood.addProperty(propertyOwner2, propertyLocation2, propertyType, bedrooms, bathrooms, garageSpaces, comments, nextAvailableDate, {from: owner2Account, gas: 500000, gasPrice: defaultGasPrice});
+while (txpool.status.pending > 0) {
+}
+failIfTxStatusError(listingTx3b, "listingTx3b");
+
+printBalances();
+printUhoodContractDetails();
+console.log("RESULT: ");
+
+
+// -----------------------------------------------------------------------------
+var msg = "Owner 1 cannot remove property 2 as he is not the owner";
 // -----------------------------------------------------------------------------
 console.log("RESULT: ----- " + msg + " -----");
 
-var listingTx2 = uhood.removeProperty(propertyOwner, propertyLocation, {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
+var listingTx4a = uhood.removeProperty(propertyHashJS2, {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
 }
-failIfTxStatusError(listingTx2, "listingTx2");
+passIfTxStatusError(listingTx4a, "listingTx4a");
 
-printBalances();
-
-var propertyData = uhood.getPropertyData(owner1Account, "96/71 Victoria Street, Potts Point NSW 2011")
-var nextAvailableDateStr = timestampToStr(propertyData[8]);
-
-console.log("RESULT: uhood.getPropertyData=" + JSON.stringify(propertyData));
-console.log("RESULT: nextAvailableDateStr = " + nextAvailableDateStr);
+// printBalances();
+printUhoodContractDetails();
 console.log("RESULT: ");
+
+
+// -----------------------------------------------------------------------------
+var msg = "Owner 2 removes the property";
+// -----------------------------------------------------------------------------
+console.log("RESULT: ----- " + msg + " -----");
+
+var listingTx4b = uhood.removeProperty(propertyHashJS2, {from: owner2Account, gas: 500000, gasPrice: defaultGasPrice});
+while (txpool.status.pending > 0) {
+}
+failIfTxStatusError(listingTx4b, "listingTx4b");
+
+// printBalances();
+printUhoodContractDetails();
+console.log("RESULT: ");
+
 
 exit;
 
@@ -481,9 +532,6 @@ printTxData("addMemberProposal1_1Tx", addMemberProposal1_1Tx);
 printClubContractDetails();
 printTokenContractDetails();
 console.log("RESULT: ");
-
-
-
 
 
 // -----------------------------------------------------------------------------
