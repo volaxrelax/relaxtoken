@@ -11,6 +11,7 @@ GETHATTACHPOINT=`grep ^IPCFILE= settings.txt | sed "s/^.*=//"`
 PASSWORD=`grep ^PASSWORD= settings.txt | sed "s/^.*=//"`
 
 SOURCEDIR=`grep ^SOURCEDIR= settings.txt | sed "s/^.*=//"`
+TOKENDIR=`grep ^TOKENDIR= settings.txt | sed "s/^.*=//"`
 
 UHOODSOL=`grep ^UHOODSOL= settings.txt | sed "s/^.*=//"`
 UHOODJS=`grep ^UHOODJS= settings.txt | sed "s/^.*=//"`
@@ -34,6 +35,7 @@ printf "MODE               = '$MODE'\n" | tee $TEST1OUTPUT
 printf "GETHATTACHPOINT    = '$GETHATTACHPOINT'\n" | tee -a $TEST1OUTPUT
 printf "PASSWORD           = '$PASSWORD'\n" | tee -a $TEST1OUTPUT
 printf "SOURCEDIR          = '$SOURCEDIR'\n" | tee -a $TEST1OUTPUT
+printf "TOKENDIR          = '$TOKENDIR'\n" | tee -a $TEST1OUTPUT
 printf "UHOODSOL     = '$UHOODSOL'\n" | tee -a $TEST1OUTPUT
 printf "CLUBFACTORYJS      = '$CLUBFACTORYJS'\n" | tee -a $TEST1OUTPUT
 printf "DEPLOYMENTDATA     = '$DEPLOYMENTDATA'\n" | tee -a $TEST1OUTPUT
@@ -49,6 +51,7 @@ printf "END_DATE           = '$END_DATE' '$END_DATE_S'\n" | tee -a $TEST1OUTPUT
 # Make copy of SOL file and modify start and end times ---
 # `cp modifiedContracts/SnipCoin.sol .`
 `cp $SOURCEDIR/$UHOODSOL .`
+`cp -a $SOURCEDIR/$TOKENDIR .`
 
 # --- Modify parameters ---
 # `perl -pi -e "s/START_DATE \= 1525132800.*$/START_DATE \= $START_DATE; \/\/ $START_DATE_S/" $CROWDSALESOL`
@@ -67,12 +70,15 @@ geth --verbosity 3 attach $GETHATTACHPOINT << EOF | tee -a $TEST1OUTPUT
 loadScript("$UHOODJS");
 loadScript("functions.js");
 
+
 var uhoodAbi = JSON.parse(uhoodOutput.contracts["$UHOODSOL:Uhood"].abi);
 var uhoodBin = "0x" + uhoodOutput.contracts["$UHOODSOL:Uhood"].bin;
 var tokenAbi = JSON.parse(uhoodOutput.contracts["$UHOODSOL:UhoodToken"].abi);
 var tokenBin = "0x" + uhoodOutput.contracts["$UHOODSOL:UhoodToken"].bin;
 var propertiesLibAbi = JSON.parse(uhoodOutput.contracts["$UHOODSOL:Properties"].abi);
 var propertiesLibBin = "0x" + uhoodOutput.contracts["$UHOODSOL:Properties"].bin;
+var propertyTokenAbi = JSON.parse(uhoodOutput.contracts["ERC721Token/ERC721Token.sol:ERC721Token"].abi);
+var propertyTokenBin = "0x" + uhoodOutput.contracts["ERC721Token/ERC721Token.sol:ERC721Token"].bin;
 
 
 console.log("DATA: uhoodAbi=" + JSON.stringify(uhoodAbi));
@@ -81,39 +87,12 @@ console.log("DATA: tokenAbi=" + JSON.stringify(tokenAbi));
 console.log("DATA: tokenBin=" + JSON.stringify(tokenBin));
 console.log("DATA: propertiesLibAbi=" + JSON.stringify(propertiesLibAbi));
 console.log("DATA: propertiesLibBin=" + JSON.stringify(propertiesLibBin));
+console.log("DATA: propertyTokenAbi=" + JSON.stringify(propertyTokenAbi));
+console.log("DATA: propertyTokenBin=" + JSON.stringify(propertyTokenBin));
 
 
 unlockAccounts("$PASSWORD");
 printBalances();
-console.log("RESULT: ");
-
-
-// -----------------------------------------------------------------------------
-var deployPropertiesLibMessage = "Deploy Properties Library";
-// -----------------------------------------------------------------------------
-console.log("RESULT: ----- " + deployPropertiesLibMessage + " -----");
-var propertiesLibContract = web3.eth.contract(propertiesLibAbi);
-var propertiesLibTx = null;
-var propertiesLibAddress = null;
-var currentBlock = eth.blockNumber;
-var propertiesLibContract = propertiesLibContract.new({from: contractOwnerAccount, data: propertiesLibBin, gas: 6000000, gasPrice: defaultGasPrice},
-  function(e, contract) {
-    if (!e) {
-      if (!contract.address) {
-        propertiesLibTx = contract.transactionHash;
-      } else {
-        propertiesLibAddress = contract.address;
-        addAccount(propertiesLibAddress, "Properties Library");
-        console.log("DATA: propertiesLibAddress=" + propertiesLibAddress);
-      }
-    }
-  }
-);
-while (txpool.status.pending > 0) {
-}
-printBalances();
-failIfTxStatusError(propertiesLibTx, deployPropertiesLibMessage);
-printTxData("propertiesLibTx", propertiesLibTx);
 console.log("RESULT: ");
 
 
@@ -155,6 +134,111 @@ failIfTxStatusError(tokenTx, msg);
 printTxData("tokenTx", tokenTx);
 console.log("RESULT: ");
 
+
+// -----------------------------------------------------------------------------
+var msg = "Deploy PropertyToken";
+var tokenSymbol = "PTY";
+var tokenName = "Property Token";
+// -----------------------------------------------------------------------------
+console.log("RESULT: ----- " + msg + " -----");
+var propertyTokenContract = web3.eth.contract(propertyTokenAbi);
+console.log(JSON.stringify(propertyTokenContract));
+var propertyTokenTx = null;
+var propertyTokenAddress = null;
+var propertyToken = propertyTokenContract.new({from: contractOwnerAccount, data: propertyTokenBin, gas: 6000000, gasPrice: defaultGasPrice},
+  function(e, contract) {
+    console.log(e);
+    if (!e) {
+      if (!contract.address) {
+        propertyTokenTx = contract.transactionHash;
+      } else {
+        propertyTokenAddress = contract.address;
+        addAccount(propertyTokenAddress, "Property Token");
+        console.log("DATA: propertyTokenAddress=" + propertyTokenAddress);
+      }
+    }
+  }
+);
+while (txpool.status.pending > 0) {
+}
+// addTokenContractAddressAndAbi(propertyTokenAddress, propertyTokenAbi);
+// console.log(propertyTokenAddress);
+// console.log(JSON.stringify(propertyTokenAbi));
+
+// printBalances();
+failIfTxStatusError(propertyTokenTx, msg);
+printTxData("propertyTokenTx", propertyTokenTx);
+console.log("RESULT: ");
+
+console.log(propertyToken.test());
+tx = propertyToken.changeTest(567, {from: owner2Account, gas: 500000, gasPrice: defaultGasPrice});
+while (txpool.status.pending > 0) {
+}
+console.log(propertyToken.test());
+
+exit;
+// -----------------------------------------------------------------------------
+var msg = "Owner 2 deposits 100 tokens to add property 2 to the smart contract";
+// -----------------------------------------------------------------------------
+var propertyOwner2 = owner2Account;
+var propertyLocation2 = "136 Raglan Street, Mosman NSW 2088";
+var propertyType = 0; // apartment
+var bedrooms = 5;
+var bathrooms = 3;
+var garageSpaces = 2;
+var comments = "Swimming Pool - Inground";
+var now = Date.now();
+var future = parseInt(now/1000) + (90*24*60*60);
+var nextAvailableDate = future;
+
+console.log("RESULT: ----- " + msg + " -----");
+printBalances();
+
+console.log("RESULTS: nextAvailableDate = " + nextAvailableDate);
+// var hashOf = "0x" + bytes4ToHex(functionSig) + addressToHex(tokenContractAddress) + addressToHex(from) + addressToHex(to) + uint256ToHex(tokens) + uint256ToHex(fee) + uint256ToHex(nonce);
+var propertyHashJS2 = web3.sha3("0x" + addressToHex(propertyOwner2) + stringToHex(propertyLocation2), {encoding: "hex"})
+console.log("RESULT: propertyHashJS = " + propertyHashJS2);
+
+var listingTx3b = propertyToken.addProperty(propertyOwner2, propertyLocation2, propertyType, bedrooms, bathrooms, garageSpaces, comments, nextAvailableDate, {from: owner2Account, gas: 500000, gasPrice: defaultGasPrice});
+while (txpool.status.pending > 0) {
+}
+failIfTxStatusError(listingTx3b, "listingTx3b");
+
+printBalances();
+
+console.log("RESULT: PropertyToken.ownerOf() = " + propertyToken.ownerOf(propertyHashJS2));
+// printUhoodContractDetails();
+console.log("RESULT: ");
+
+exit;
+
+// -----------------------------------------------------------------------------
+var deployPropertiesLibMessage = "Deploy Properties Library";
+// -----------------------------------------------------------------------------
+console.log("RESULT: ----- " + deployPropertiesLibMessage + " -----");
+var propertiesLibContract = web3.eth.contract(propertiesLibAbi);
+var propertiesLibTx = null;
+var propertiesLibAddress = null;
+var currentBlock = eth.blockNumber;
+var propertiesLibContract = propertiesLibContract.new({from: contractOwnerAccount, data: propertiesLibBin, gas: 6000000, gasPrice: defaultGasPrice},
+  function(e, contract) {
+    if (!e) {
+      if (!contract.address) {
+        propertiesLibTx = contract.transactionHash;
+      } else {
+        propertiesLibAddress = contract.address;
+        addAccount(propertiesLibAddress, "Properties Library");
+        console.log("DATA: propertiesLibAddress=" + propertiesLibAddress);
+      }
+    }
+  }
+);
+while (txpool.status.pending > 0) {
+}
+printBalances();
+failIfTxStatusError(propertiesLibTx, deployPropertiesLibMessage);
+printTxData("propertiesLibTx", propertiesLibTx);
+console.log("RESULT: ");
 
 
 // -----------------------------------------------------------------------------
@@ -827,6 +911,6 @@ console.log("RESULT: ");
 
 EOF
 grep "DATA: " $TEST1OUTPUT | sed "s/DATA: //" > $DEPLOYMENTDATA
-cat $DEPLOYMENTDATA
+#cat $DEPLOYMENTDATA
 grep "RESULT: " $TEST1OUTPUT | sed "s/RESULT: //" > $TEST1RESULTS
-cat $TEST1RESULTS
+#cat $TEST1RESULTS

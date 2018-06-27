@@ -2,6 +2,7 @@ IPCFILE=ipc:./testchain/geth.ipc
 PASSWORD=
 
 SOURCEDIR=../contracts
+TOKENDIR=../contracts/ERC721Token
 
 UHOODSOL=uhood.sol
 UHOODJS=uhood.js
