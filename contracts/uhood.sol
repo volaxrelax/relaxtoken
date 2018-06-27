@@ -404,11 +404,15 @@ contract PropertyToken is ERC721Token {
     }
 
     constructor() public ERC721Token("Property Token", "PTY") {
-        test = 123;
+        /* test = 123; */
     }
 
-    function changeTest (uint newTest) {
+    function changeTest (uint newTest) public {
         test = newTest;
+    }
+
+    function getTest () public view returns (uint) {
+        return test;
     }
 
     function addProperty(

@@ -170,48 +170,53 @@ failIfTxStatusError(propertyTokenTx, msg);
 printTxData("propertyTokenTx", propertyTokenTx);
 console.log("RESULT: ");
 
-console.log(propertyToken.test());
-tx = propertyToken.changeTest(567, {from: owner2Account, gas: 500000, gasPrice: defaultGasPrice});
+console.log(propertyToken.totalSupply());
+console.log(propertyToken.name());
+console.log(propertyToken.symbol());
+
+
+
+console.log(propertyToken.getTest());
+tx = propertyToken.changeTest(567, {from: contractOwnerAccount, gas: 5000000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
 }
-console.log(propertyToken.test());
-
+console.log(propertyToken.getTest());
 exit;
-// -----------------------------------------------------------------------------
-var msg = "Owner 2 deposits 100 tokens to add property 2 to the smart contract";
-// -----------------------------------------------------------------------------
-var propertyOwner2 = owner2Account;
-var propertyLocation2 = "136 Raglan Street, Mosman NSW 2088";
-var propertyType = 0; // apartment
-var bedrooms = 5;
-var bathrooms = 3;
-var garageSpaces = 2;
-var comments = "Swimming Pool - Inground";
-var now = Date.now();
-var future = parseInt(now/1000) + (90*24*60*60);
-var nextAvailableDate = future;
-
-console.log("RESULT: ----- " + msg + " -----");
-printBalances();
-
-console.log("RESULTS: nextAvailableDate = " + nextAvailableDate);
-// var hashOf = "0x" + bytes4ToHex(functionSig) + addressToHex(tokenContractAddress) + addressToHex(from) + addressToHex(to) + uint256ToHex(tokens) + uint256ToHex(fee) + uint256ToHex(nonce);
-var propertyHashJS2 = web3.sha3("0x" + addressToHex(propertyOwner2) + stringToHex(propertyLocation2), {encoding: "hex"})
-console.log("RESULT: propertyHashJS = " + propertyHashJS2);
-
-var listingTx3b = propertyToken.addProperty(propertyOwner2, propertyLocation2, propertyType, bedrooms, bathrooms, garageSpaces, comments, nextAvailableDate, {from: owner2Account, gas: 500000, gasPrice: defaultGasPrice});
-while (txpool.status.pending > 0) {
-}
-failIfTxStatusError(listingTx3b, "listingTx3b");
-
-printBalances();
-
-console.log("RESULT: PropertyToken.ownerOf() = " + propertyToken.ownerOf(propertyHashJS2));
-// printUhoodContractDetails();
-console.log("RESULT: ");
-
-exit;
-
+// // -----------------------------------------------------------------------------
+// var msg = "Owner 2 deposits 100 tokens to add property 2 to the smart contract";
+// // -----------------------------------------------------------------------------
+// var propertyOwner2 = owner2Account;
+// var propertyLocation2 = "136 Raglan Street, Mosman NSW 2088";
+// var propertyType = 0; // apartment
+// var bedrooms = 5;
+// var bathrooms = 3;
+// var garageSpaces = 2;
+// var comments = "Swimming Pool - Inground";
+// var now = Date.now();
+// var future = parseInt(now/1000) + (90*24*60*60);
+// var nextAvailableDate = future;
+//
+// console.log("RESULT: ----- " + msg + " -----");
+// printBalances();
+//
+// console.log("RESULTS: nextAvailableDate = " + nextAvailableDate);
+// // var hashOf = "0x" + bytes4ToHex(functionSig) + addressToHex(tokenContractAddress) + addressToHex(from) + addressToHex(to) + uint256ToHex(tokens) + uint256ToHex(fee) + uint256ToHex(nonce);
+// var propertyHashJS2 = web3.sha3("0x" + addressToHex(propertyOwner2) + stringToHex(propertyLocation2), {encoding: "hex"})
+// console.log("RESULT: propertyHashJS = " + propertyHashJS2);
+//
+// var listingTx3b = propertyToken.addProperty(propertyOwner2, propertyLocation2, propertyType, bedrooms, bathrooms, garageSpaces, comments, nextAvailableDate, {from: owner2Account, gas: 500000, gasPrice: defaultGasPrice});
+// while (txpool.status.pending > 0) {
+// }
+// failIfTxStatusError(listingTx3b, "listingTx3b");
+//
+// printBalances();
+//
+// console.log("RESULT: PropertyToken.ownerOf() = " + propertyToken.ownerOf(propertyHashJS2));
+// // printUhoodContractDetails();
+// console.log("RESULT: ");
+//
+// exit;
+//
 // -----------------------------------------------------------------------------
 var deployPropertiesLibMessage = "Deploy Properties Library";
 // -----------------------------------------------------------------------------

@@ -38,9 +38,9 @@
 -- ------------------------------------------ --------------------------- ------------------------------ ---------------------------
 
 PASS Deploy UhoodToken
-tokenTx status=0x1 Success gas=6000000 gasUsed=1171131 costETH=0.018738096 costUSD=12.66151884816 @ ETH/USD=675.71 gasPrice=16 gwei block=23979 txIx=0 txId=0xebf64279200729f085996cf4aa9a2059b410a84f023a2e48ace8f042f8980155 @ 1530080488 Wed, 27 Jun 2018 06:21:28 UTC
+tokenTx status=0x1 Success gas=6000000 gasUsed=1171131 costETH=0.018738096 costUSD=12.66151884816 @ ETH/USD=675.71 gasPrice=16 gwei block=1182 txIx=0 txId=0x23267d097ed99acc151f45bd3a9b4867ded1e1ecc6fc439d178fd9e3fed21072 @ 1530085515 Wed, 27 Jun 2018 07:45:15 UTC
 
 ----- Deploy PropertyToken -----
 PASS Deploy PropertyToken
-propertyTokenTx status=0x1 Success gas=6000000 gasUsed=1231113 costETH=0.019697808 costUSD=13.31000584368 @ ETH/USD=675.71 gasPrice=16 gwei block=23982 txIx=0 txId=0xe80995c1018b934028e2bc953af99551c82788f5f648bbe61254801e6ca4f33c @ 1530080491 Wed, 27 Jun 2018 06:21:31 UTC
+propertyTokenTx status=0x1 Success gas=6000000 gasUsed=1231113 costETH=0.019697808 costUSD=13.31000584368 @ ETH/USD=675.71 gasPrice=16 gwei block=1185 txIx=0 txId=0xe80995c1018b934028e2bc953af99551c82788f5f648bbe61254801e6ca4f33c @ 1530085518 Wed, 27 Jun 2018 07:45:18 UTC
 
