@@ -632,24 +632,29 @@ function printPropertyType(n) {
     return propertyType;
 }
 
+function hexToInt(hash) {
+    return new BigNumber(hash.substring(2), 16)
+}
+
+
 // -----------------------------------------------------------------------------
 // Uhood Contract
 // -----------------------------------------------------------------------------
-var uhoodAddress = null;
-var uhoodAbi = null;
+var propertyTokenAddress = null;
+var propertyTokenAbi = null;
 var uhoodFromBlock = 0;
 
-function printUhoodContractDetails() {
+function printPropertyTokenContractDetails() {
   // console.log("RESULT: uhoodAddress=" + uhoodAddress);
-  if (uhoodAddress != null && uhoodAbi != null) {
-    var uhood = eth.contract(uhoodAbi).at(uhoodAddress);
+  if (propertyTokenAddress != null && propertyTokenAbi != null) {
+    var uhood = eth.contract(propertyTokenAbi).at(propertyTokenAddress);
     // console.log("RESULT: uhood.tokensToAddNewProperties=" + uhood.tokensToAddNewProperties());
     // console.log("RESULT: uhood.tokenAddress=" + uhood.tokenAddress());
     var i;
-    for (i = 0; i < uhood.numberOfProperties(); i++) {
-      var property = uhood.getPropertyByIndex(i);
-      var data = uhood.getPropertyData(property);
-      console.log("RESULT: uhood.properties[" + i + "]=" + property + " [" + data[0] + ", "  + data[1] + ", '" +
+    for (i = 0; i < propertyToken.numberOfProperties(); i++) {
+      var property = propertyToken.getPropertyByIndex(i);
+      var data = propertyToken.getPropertyData(property);
+      console.log("RESULT: propertyToken.properties[" + i + "]=" + property + " owned by: " + propertyToken.ownerOf(hexToInt(property)) + " [" + data[0] + ", "  + data[1] + ", '" +
         data[2] + "', '" + data[3] + "', '" + printPropertyType(data[4]) + "', " + data[5] + ", " + data[6] + ", " + data[7] + ", '" +
         data[8]  + "', '" + timestampToStr(data[9]) + "']");
     }

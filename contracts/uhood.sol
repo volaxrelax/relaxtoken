@@ -13,9 +13,9 @@
 
 pragma solidity 0.4.24;
 
-/* import "./ERC721Token/ERC721Basic.sol";
-import "./ERC721Token/ERC721BasicToken.sol"; */
-import "./ERC721Token/ERC721Token.sol";
+import "./ERC721Token/ERC721Basic.sol";
+import "./ERC721Token/ERC721BasicToken.sol";
+/* import "./ERC721Token/ERC721Token.sol"; */
 
 
 contract ERC20Interface {
@@ -355,8 +355,7 @@ contract ERC721 {
 // ----------------------------------------------------------------------------
 // PropertyToken
 // ----------------------------------------------------------------------------
-contract PropertyToken is ERC721Token {
-
+contract PropertyToken is ERC721BasicToken {
     enum PropertyType {
         House,                         //  0 House
         ApartmentAndUnit,              //  1 Apartment and unit
@@ -381,7 +380,7 @@ contract PropertyToken is ERC721Token {
     struct Property {
         bool exists;
         uint index;
-        address owner;
+        address originalOwner;
         string location;
         PropertyType propertyType;
         NumberOf bedrooms;
@@ -391,32 +390,23 @@ contract PropertyToken is ERC721Token {
         uint nextAvailableDate;
     }
 
-    event PropertyAdded(bytes32 propertyHash, address indexed ownerAddress, string name, uint totalAfter);
-    event PropertyRemoved(bytes32 propertyHash, address indexed ownerAddress, string name, uint totalAfter);
+    event PropertyAdded(bytes32 propertyHash, address indexed ownerAddress, string location, uint totalAfter);
+    event PropertyRemoved(bytes32 propertyHash, address indexed ownerAddress, string location, uint totalAfter);
 
+    UhoodTokenInterface public token;
+    uint public tokensToAddNewProperties;
+    address public tokenAddress;
     mapping(bytes32 => Property) public entries;
     bytes32[] public index;
-    uint public test;
 
-    modifier onlyOwner (uint _tokenId) {
-        require(ownerOf(uint(_tokenId)) == msg.sender);
-        _;
-    }
-
-    constructor() public ERC721Token("Property Token", "PTY") {
-        /* test = 123; */
-    }
-
-    function changeTest (uint newTest) public {
-        test = newTest;
-    }
-
-    function getTest () public view returns (uint) {
-        return test;
+    constructor(address _uhoodToken, uint _tokensToAddNewProperties) public {
+        token = UhoodTokenInterface(_uhoodToken);
+        tokenAddress = _uhoodToken;
+        tokensToAddNewProperties = _tokensToAddNewProperties;
     }
 
     function addProperty(
-        address _ownerAddress,
+        address _originalOwnerAddress,
         string _propertyLocation,
         PropertyType _propertyType,
         NumberOf _bedrooms,
@@ -426,24 +416,30 @@ contract PropertyToken is ERC721Token {
         uint _nextAvailableDate)
         public
     {
-        bytes32 propertyHash = keccak256(abi.encodePacked(_ownerAddress, _propertyLocation));
+        bytes32 propertyHash = keccak256(abi.encodePacked(_originalOwnerAddress, _propertyLocation));
 
-        require(entries[propertyHash].exists);
-        require(_ownerAddress != 0x0);
+        require(!entries[propertyHash].exists);
+        require(_originalOwnerAddress != 0x0);
         require(bytes(_propertyLocation).length > 0);
+        require(token.transferFrom(msg.sender, this, tokensToAddNewProperties));
 
         index.push(propertyHash);
         entries[propertyHash] = Property(true, index.length - 1,
-                                            _ownerAddress, _propertyLocation, _propertyType, _bedrooms,
+                                            _originalOwnerAddress, _propertyLocation, _propertyType, _bedrooms,
                                             _bathrooms, _garageSpaces, _comments, _nextAvailableDate);
-        _mint(_ownerAddress, uint(propertyHash));
-        emit PropertyAdded(propertyHash, _ownerAddress, _propertyLocation, index.length);
+        _mint(_originalOwnerAddress, uint(propertyHash));
+        emit PropertyAdded(propertyHash, _originalOwnerAddress, _propertyLocation, index.length);
     }
 
-    function removeProperty(bytes32 _propertyHash) public onlyOwner(uint(_propertyHash)) {
+    function hashToInt(bytes32 _propertyHash) public pure returns (uint) {
+        return uint(_propertyHash);
+    }
+
+    function removeProperty(bytes32 _propertyHash) public onlyOwnerOf(uint(_propertyHash)) {
         require(entries[_propertyHash].exists);
         uint removeIndex = entries[_propertyHash].index;
-        address _ownerAddress = entries[_propertyHash].owner;
+        /* address _ownerAddress = entries[_propertyHash].owner; */
+        address _ownerAddress = ownerOf(uint(_propertyHash));
         string memory _propertyLocation = entries[_propertyHash].location;
         emit PropertyRemoved(_propertyHash, _ownerAddress, _propertyLocation, index.length - 1);
         uint lastIndex = index.length - 1;
@@ -455,8 +451,41 @@ contract PropertyToken is ERC721Token {
             index.length--;
         }
         _burn(_ownerAddress, uint(_propertyHash));
-        emit PropertyRemoved(_propertyHash, _ownerAddress, _propertyLocation, index.length);
+        /* emit PropertyRemoved(_propertyHash, _ownerAddress, _propertyLocation, index.length); */
     }
+
+    function numberOfProperties() public view returns (uint) {
+        return index.length;
+    }
+
+    function getPropertyData(
+        bytes32 _propertyHash
+    )
+        public
+        view
+        returns (
+            bool exists,
+            uint index_,
+            address owner,
+            string location,
+            PropertyType propertyType,
+            NumberOf bedrooms,
+            NumberOf bathrooms,
+            NumberOf garageSpaces,
+            string comments,
+            uint nextAvailableDate)
+    {
+        /* bytes32 propertyHash = keccak256(abi.encodePacked(_ownerAddress, _propertyLocation)); */
+        Property memory property = entries[_propertyHash];
+        return (property.exists, property.index, property.originalOwner, property.location, property.propertyType,
+                property.bedrooms, property.bathrooms, property.garageSapces, property.comments,
+                property.nextAvailableDate);
+    }
+
+    function getPropertyByIndex(uint _index) public view returns (bytes32 property) {
+        return index[_index];
+    }
+
 }
 
 
