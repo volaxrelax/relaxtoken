@@ -3,6 +3,7 @@
 // https://github.com/vincentshangjin/uhoodchain
 // Based on ClubEth.App Project https://github.com/bokkypoobah/ClubEth
 // https://github.com/saurfang/erc809-billboard/blob/master/contracts/BasicBillboard.sol
+// https://github.com/BookLocal/proofOfConcept
 // the Uhoodchain Dapp Project - 2018. The MIT Licence.
 // ----------------------------------------------------------------------------
 
@@ -289,6 +290,8 @@ contract PropertyToken is ERC721BasicToken, Owned {
         NumberOf garageSpaces;
         string comments;
         uint nextAvailableDate;
+        uint tokensAsBond;
+        address currentRenter;
     }
 
     event PropertyAdded(bytes32 propertyHash, address indexed ownerAddress, string location, uint totalAfter);
@@ -299,11 +302,15 @@ contract PropertyToken is ERC721BasicToken, Owned {
     address public tokenAddress;
     mapping(bytes32 => Property) public entries;
     bytes32[] public index;
+    uint public minRentTime;
+    mapping (uint => mapping (uint => address)) public reservations;
+    mapping (address => mapping (uint => uint)) public bondTaken;
 
-    constructor(address _uhoodToken, uint _tokensToAddNewProperties) public {
+    constructor(address _uhoodToken, uint _tokensToAddNewProperties, uint _minRentTime) public {
         token = UhoodTokenInterface(_uhoodToken);
         tokenAddress = _uhoodToken;
         tokensToAddNewProperties = _tokensToAddNewProperties;
+        minRentTime = _minRentTime;
     }
 
     function addProperty(
@@ -314,7 +321,9 @@ contract PropertyToken is ERC721BasicToken, Owned {
         NumberOf _bathrooms,
         NumberOf _garageSpaces,
         string _comments,
-        uint _nextAvailableDate)
+        uint _nextAvailableDate,
+        uint _tokensAsBond,
+        address _currentRenter)
         public
     {
         bytes32 propertyHash = keccak256(abi.encodePacked(_originalOwnerAddress, _propertyLocation));
@@ -322,18 +331,16 @@ contract PropertyToken is ERC721BasicToken, Owned {
         require(!entries[propertyHash].exists);
         require(_originalOwnerAddress != 0x0);
         require(bytes(_propertyLocation).length > 0);
+        require(_tokensAsBond > 0);
         require(token.transferFrom(msg.sender, this, tokensToAddNewProperties));
 
         index.push(propertyHash);
         entries[propertyHash] = Property(true, index.length - 1,
                                             _originalOwnerAddress, _propertyLocation, _propertyType, _bedrooms,
-                                            _bathrooms, _garageSpaces, _comments, _nextAvailableDate);
+                                            _bathrooms, _garageSpaces, _comments, _nextAvailableDate,
+                                            _tokensAsBond, _currentRenter);
         _mint(_originalOwnerAddress, uint(propertyHash));
         emit PropertyAdded(propertyHash, _originalOwnerAddress, _propertyLocation, index.length);
-    }
-
-    function hashToInt(bytes32 _propertyHash) public pure returns (uint) {
-        return uint(_propertyHash);
     }
 
     function removeProperty(bytes32 _propertyHash) public onlyOwnerOf(uint(_propertyHash)) {
@@ -371,7 +378,9 @@ contract PropertyToken is ERC721BasicToken, Owned {
         NumberOf _bedrooms,
         NumberOf _bathrooms,
         NumberOf _garageSpaces,
-        string _comments)
+        string _comments,
+        uint _tokensAsBond,
+        address _currentRenter)
         public
         onlyOwnerOf(uint(_propertyHash))
     {
@@ -386,6 +395,8 @@ contract PropertyToken is ERC721BasicToken, Owned {
         property.bathrooms = _bathrooms;
         property.garageSpaces = _garageSpaces;
         property.comments = _comments;
+        property.tokensAsBond = _tokensAsBond;
+        property.currentRenter = _currentRenter;
     }
 
     function numberOfProperties() public view returns (uint) {
@@ -407,16 +418,124 @@ contract PropertyToken is ERC721BasicToken, Owned {
             NumberOf bathrooms,
             NumberOf garageSpaces,
             string comments,
-            uint nextAvailableDate)
+            uint nextAvailableDate,
+            uint tokensAsBond,
+            address currentRenter)
     {
         Property memory property = entries[_propertyHash];
         return (property.exists, property.index, property.originalOwner, property.location, property.propertyType,
                 property.bedrooms, property.bathrooms, property.garageSpaces, property.comments,
-                property.nextAvailableDate);
+                property.nextAvailableDate, property.tokensAsBond, property.currentRenter);
     }
 
     function getPropertyByIndex(uint _index) public view returns (bytes32 property) {
         return index[_index];
+    }
+
+    function hashToInt(bytes32 _propertyHash) public pure returns (uint) {
+        return uint(_propertyHash);
+    }
+
+    function intToHash(uint _tokenId) public pure returns (bytes32) {
+        return bytes32(_tokenId);
+    }
+
+    function reserve(uint _tokenId, uint _tokensAsBond, uint _start, uint _stop)
+        external
+        returns (bool)
+    {
+        address _renter = msg.sender;
+        bytes32 _propertyHash = bytes32(_tokenId);
+        Property memory property = entries[_propertyHash];
+
+        require(token.transferFrom(msg.sender, this, property.tokensAsBond));
+        bondTaken[msg.sender][_tokenId] = bondTaken[msg.sender][_tokenId].add(_tokensAsBond);
+        require(_start < _stop);
+
+        // check availability (for all dates in range)
+        for (uint i = _start; i <= _stop; i++) {
+            /* if (!_isAvailable(_tokenId, i)) {
+                return false;
+            } */
+        }
+
+        // make reservation
+        for (i = _start; i <= _stop; i++) {
+            reservations[_tokenId][i] = _renter;
+        }
+
+        return true;
+    }
+
+    function access(uint _tokenId) public {
+
+        uint256 _time = now.div(minRentTime);
+
+        bytes32 _propertyHash = bytes32(_tokenId);
+        // convert time to minimum rental units
+        Property storage property = entries[_propertyHash];
+
+        // require permissions
+        // 1) owner
+        // 2) reserved guest
+        require(reservations[_tokenId][_time] == msg.sender || ownerOf(_tokenId) == msg.sender);
+        property.currentRenter = reservations[_tokenId][_time];
+    }
+
+    // @dev settle
+    function settle(uint _tokenId) external {
+        bytes32 _propertyHash = bytes32(_tokenId);
+        // convert time to minimum rental units
+        Property storage property = entries[_propertyHash];
+
+        if (ownerOf(_tokenId) == msg.sender || property.currentRenter == msg.sender) {
+            property.currentRenter = address(0);
+        }
+    }
+
+    // @dev cancel reservation
+    function cancelReservation(uint _tokenId, uint _start, uint _stop) external returns(bool){
+        // only cancle future reservations
+        require(_isFuture(_start));
+        require(_start < _stop);
+
+        // only room owner or renter address can cancel
+        if (ownerOf(_tokenId) != msg.sender) {
+            for (uint i = _start; i <= _stop; i++) {
+                require(_getRenter(_tokenId, i) == msg.sender);
+            }
+        }
+
+        for (i = _start; i <= _stop; i++) {
+            delete reservations[_tokenId][i];
+        }
+
+        return true;
+    }
+
+    // @dev lookup function
+    function checkAvailable(uint _tokenId, uint _start) public view returns (bool) {
+        return reservations[_tokenId][_start] == address(0);
+    }
+
+    // @dev internal check if reservation date is _isFuture
+    function _isFuture(uint _time) internal view returns (bool future) {
+        uint256 _now = now.div(minRentTime);
+        return _time > _now;
+    }
+
+    // @dev check availability
+    function _isAvailable(uint _tokenId, uint _time) internal view returns (bool) {
+        return reservations[_tokenId][_time] == address(0);
+    }
+
+    // @dev find renter of token at specific time
+    function _getRenter(uint _tokenId, uint _time)
+        internal
+        view
+        returns (address _renter)
+    {
+        _renter = reservations[_tokenId][_time];
     }
 
 }

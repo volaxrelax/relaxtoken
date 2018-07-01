@@ -1,6 +1,6 @@
-// ETH/USD 19 May 2018 00:14 AEDT from CMC and ethgasstation.info
-var ethPriceUSD = 675.71;
-var defaultGasPrice = web3.toWei(16, "gwei");
+// ETH/USD 1 Jul 2018 12:54 AEDT from CMC and ethgasstation.info
+var ethPriceUSD = 451.71;
+var defaultGasPrice = web3.toWei(17, "gwei");
 
 // -----------------------------------------------------------------------------
 // Accounts
@@ -643,6 +643,7 @@ function hexToInt(hash) {
 var propertyTokenAddress = null;
 var propertyTokenAbi = null;
 var uhoodFromBlock = 0;
+var decimals = 18;
 
 function printPropertyTokenContractDetails() {
   // console.log("RESULT: uhoodAddress=" + uhoodAddress);
@@ -656,7 +657,7 @@ function printPropertyTokenContractDetails() {
       var data = propertyToken.getPropertyData(property);
       console.log("RESULT: propertyToken.properties[" + i + "]=" + property + " owned by: " + propertyToken.ownerOf(hexToInt(property)) + " [" + data[0] + ", "  + data[1] + ", '" +
         data[2] + "', '" + data[3] + "', '" + printPropertyType(data[4]) + "', " + data[5] + ", " + data[6] + ", " + data[7] + ", '" +
-        data[8]  + "', '" + timestampToStr(data[9]) + "']");
+        data[8]  + "', '" + timestampToStr(data[9])  + "', " + data[10].shift(-decimals) + ", " + data[11] + "]");
     }
 
     var latestBlock = eth.blockNumber;

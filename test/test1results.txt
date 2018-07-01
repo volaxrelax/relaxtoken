@@ -20,8 +20,8 @@
 ----- Deploy UhoodToken -----
  # Account                                             EtherBalanceChange                          Token Name
 -- ------------------------------------------ --------------------------- ------------------------------ ---------------------------
- 0 0xa00af22d07c87d96eeeb0ed583f8f6ac7812827e        0.018738096000000000           0.000000000000000000 Account #0 - Miner
- 1 0xa11aae29840fbb5c86e6fd4cf809eba183aef433       -0.018738096000000000   500000000.000000000000000000 Account #1 - Contract Owner/Admin
+ 0 0xa00af22d07c87d96eeeb0ed583f8f6ac7812827e        0.019908139000000000           0.000000000000000000 Account #0 - Miner
+ 1 0xa11aae29840fbb5c86e6fd4cf809eba183aef433       -0.019908139000000000   500000000.000000000000000000 Account #1 - Contract Owner/Admin
  2 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976        0.000000000000000000           0.000000000000000000 Account #2 - Property Owner 1
  3 0xa33a6c312d9ad0e0f2e95541beed0cc081621fd0        0.000000000000000000           0.000000000000000000 Account #3 - Property Owner 2
  4 0xa44a08d3f6933c69212114bb66e2df1813651844        0.000000000000000000           0.000000000000000000 Account #4 - Renter 1
@@ -32,28 +32,29 @@
  9 0xa99a0ae3354c06b1459fd441a32a3f71005d7da0        0.000000000000000000           0.000000000000000000 Account #9
 10 0xaaaa9de1e6c564446ebca0fd102d8bd92093c756        0.000000000000000000           0.000000000000000000 Account #10
 11 0xabba43e7594e3b76afb157989e93c6621497fd4b        0.000000000000000000           0.000000000000000000 Account #11
-12 0x0705aa935d1e8b988c6b7d9ab19f9e46bcaf7a8e        0.000000000000000000           0.000000000000000000 token
+12 0x79db4594726512dfd46cc32fa291b2eb8de9b3b1        0.000000000000000000           0.000000000000000000 token
 -- ------------------------------------------ --------------------------- ------------------------------ ---------------------------
                                                                             500000000.000000000000000000 Total Token Balances
 -- ------------------------------------------ --------------------------- ------------------------------ ---------------------------
 
 PASS Deploy UhoodToken
-tokenTx status=0x1 Success gas=6000000 gasUsed=1171131 costETH=0.018738096 costUSD=12.66151884816 @ ETH/USD=675.71 gasPrice=16 gwei block=18542 txIx=0 txId=0xf8c4a543bb047ea2ee341be8a1fe960f2b2ef80fbe6eac02df344150969f503b @ 1530358037 Sat, 30 Jun 2018 11:27:17 UTC
+tokenTx status=0x1 Success gas=6000000 gasUsed=1171067 costETH=0.019908139 costUSD=8.99270546769 @ ETH/USD=451.71 gasPrice=17 gwei block=9275 txIx=0 txId=0x96f38a416df63a58ce91463921c5e717823ae6852f6585e6269b9fb98afe11c4 @ 1530415271 Sun, 01 Jul 2018 03:21:11 UTC
 
 ----- Deploy PropertyToken -----
 PASS Deploy PropertyToken
-propertyTokenTx status=0x1 Success gas=6000000 gasUsed=2311295 costETH=0.03698072 costUSD=24.9882423112 @ ETH/USD=675.71 gasPrice=16 gwei block=18545 txIx=0 txId=0x23d423afc15c48bb95e6b8a899db57dfca9067ad28bca7a236d0ea9d8894045d @ 1530358040 Sat, 30 Jun 2018 11:27:20 UTC
+propertyTokenTx status=0x1 Success gas=6000000 gasUsed=2935815 costETH=0.049908855 costUSD=22.54432889205 @ ETH/USD=451.71 gasPrice=17 gwei block=9278 txIx=0 txId=0xafd4a595d79a70ec3b7ac8b58177df4b40a3d1cc4cfdd338776ed21a2afda5d4 @ 1530415274 Sun, 01 Jul 2018 03:21:14 UTC
 
 ----- Transfer 20000 tokens to owner 1, owner 2, renter 1 and renter 2 -----
 PASS  - transfer 20000 tokens to owner 1
 PASS  - transfer 20000 tokens to owner 2
 PASS  - transfer 20000 tokens to retner 1
 PASS  - transfer 20000 tokens to renter 2
+transferTokensTx1 status=0x1 Success gas=500000 gasUsed=51756 costETH=0.000879852 costUSD=0.39743794692 @ ETH/USD=451.71 gasPrice=17 gwei block=9280 txIx=0 txId=0x6becde9af57549565a7bb6ab3a961a01960e0dc260bfb0ddded5046935385586 @ 1530415276 Sun, 01 Jul 2018 03:21:16 UTC
 
  # Account                                             EtherBalanceChange                          Token Name
 -- ------------------------------------------ --------------------------- ------------------------------ ---------------------------
- 0 0xa00af22d07c87d96eeeb0ed583f8f6ac7812827e        0.059031200000000000           0.000000000000000000 Account #0 - Miner
- 1 0xa11aae29840fbb5c86e6fd4cf809eba183aef433       -0.059031200000000000   499920000.000000000000000000 Account #1 - Contract Owner/Admin
+ 0 0xa00af22d07c87d96eeeb0ed583f8f6ac7812827e        0.073336402000000000           0.000000000000000000 Account #0 - Miner
+ 1 0xa11aae29840fbb5c86e6fd4cf809eba183aef433       -0.073336402000000000   499920000.000000000000000000 Account #1 - Contract Owner/Admin
  2 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976        0.000000000000000000       20000.000000000000000000 Account #2 - Property Owner 1
  3 0xa33a6c312d9ad0e0f2e95541beed0cc081621fd0        0.000000000000000000       20000.000000000000000000 Account #3 - Property Owner 2
  4 0xa44a08d3f6933c69212114bb66e2df1813651844        0.000000000000000000       20000.000000000000000000 Account #4 - Renter 1
@@ -64,8 +65,8 @@ PASS  - transfer 20000 tokens to renter 2
  9 0xa99a0ae3354c06b1459fd441a32a3f71005d7da0        0.000000000000000000           0.000000000000000000 Account #9
 10 0xaaaa9de1e6c564446ebca0fd102d8bd92093c756        0.000000000000000000           0.000000000000000000 Account #10
 11 0xabba43e7594e3b76afb157989e93c6621497fd4b        0.000000000000000000           0.000000000000000000 Account #11
-12 0x0705aa935d1e8b988c6b7d9ab19f9e46bcaf7a8e        0.000000000000000000           0.000000000000000000 token
-13 0x3526747b4794e2e9200c8e150ecedb735833b047        0.000000000000000000           0.000000000000000000 Property Token
+12 0x79db4594726512dfd46cc32fa291b2eb8de9b3b1        0.000000000000000000           0.000000000000000000 token
+13 0xf42e922b9a245cc6fda2f1291b2937f4af790a82        0.000000000000000000           0.000000000000000000 Property Token
 -- ------------------------------------------ --------------------------- ------------------------------ ---------------------------
                                                                             500000000.000000000000000000 Total Token Balances
 -- ------------------------------------------ --------------------------- ------------------------------ ---------------------------
@@ -73,8 +74,8 @@ PASS  - transfer 20000 tokens to renter 2
 ----- Owner 1 adds property 1 to the smart contract -----
  # Account                                             EtherBalanceChange                          Token Name
 -- ------------------------------------------ --------------------------- ------------------------------ ---------------------------
- 0 0xa00af22d07c87d96eeeb0ed583f8f6ac7812827e        0.059031200000000000           0.000000000000000000 Account #0 - Miner
- 1 0xa11aae29840fbb5c86e6fd4cf809eba183aef433       -0.059031200000000000   499920000.000000000000000000 Account #1 - Contract Owner/Admin
+ 0 0xa00af22d07c87d96eeeb0ed583f8f6ac7812827e        0.073336402000000000           0.000000000000000000 Account #0 - Miner
+ 1 0xa11aae29840fbb5c86e6fd4cf809eba183aef433       -0.073336402000000000   499920000.000000000000000000 Account #1 - Contract Owner/Admin
  2 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976        0.000000000000000000       20000.000000000000000000 Account #2 - Property Owner 1
  3 0xa33a6c312d9ad0e0f2e95541beed0cc081621fd0        0.000000000000000000       20000.000000000000000000 Account #3 - Property Owner 2
  4 0xa44a08d3f6933c69212114bb66e2df1813651844        0.000000000000000000       20000.000000000000000000 Account #4 - Renter 1
@@ -85,8 +86,8 @@ PASS  - transfer 20000 tokens to renter 2
  9 0xa99a0ae3354c06b1459fd441a32a3f71005d7da0        0.000000000000000000           0.000000000000000000 Account #9
 10 0xaaaa9de1e6c564446ebca0fd102d8bd92093c756        0.000000000000000000           0.000000000000000000 Account #10
 11 0xabba43e7594e3b76afb157989e93c6621497fd4b        0.000000000000000000           0.000000000000000000 Account #11
-12 0x0705aa935d1e8b988c6b7d9ab19f9e46bcaf7a8e        0.000000000000000000           0.000000000000000000 token
-13 0x3526747b4794e2e9200c8e150ecedb735833b047        0.000000000000000000           0.000000000000000000 Property Token
+12 0x79db4594726512dfd46cc32fa291b2eb8de9b3b1        0.000000000000000000           0.000000000000000000 token
+13 0xf42e922b9a245cc6fda2f1291b2937f4af790a82        0.000000000000000000           0.000000000000000000 Property Token
 -- ------------------------------------------ --------------------------- ------------------------------ ---------------------------
                                                                             500000000.000000000000000000 Total Token Balances
 -- ------------------------------------------ --------------------------- ------------------------------ ---------------------------
@@ -94,11 +95,13 @@ PASS  - transfer 20000 tokens to renter 2
 propertyHashJS1 = 0x7e86fbcc4bc9c89261314c3d716892590e1cee236f7b98de954c79210593b107
 PASS listingTx1a
 PASS listingTx1b
+listingTx1a status=0x1 Success gas=500000 gasUsed=45611 costETH=0.000775387 costUSD=0.35025006177 @ ETH/USD=451.71 gasPrice=17 gwei block=9284 txIx=0 txId=0xf9834e51469dbc838ca98ce0389bd273b8680cb76a0227494c24f273a5c809ae @ 1530415280 Sun, 01 Jul 2018 03:21:20 UTC
+listingTx1b status=0x1 Success gas=500000 gasUsed=364565 costETH=0.006197605 costUSD=2.79952015455 @ ETH/USD=451.71 gasPrice=17 gwei block=9286 txIx=0 txId=0x5836b8bbbc8e6182095574a44be420528982c6fc3b4f8a133980d2bb4f317173 @ 1530415282 Sun, 01 Jul 2018 03:21:22 UTC
  # Account                                             EtherBalanceChange                          Token Name
 -- ------------------------------------------ --------------------------- ------------------------------ ---------------------------
- 0 0xa00af22d07c87d96eeeb0ed583f8f6ac7812827e        0.065175968000000000           0.000000000000000000 Account #0 - Miner
- 1 0xa11aae29840fbb5c86e6fd4cf809eba183aef433       -0.059031200000000000   499920000.000000000000000000 Account #1 - Contract Owner/Admin
- 2 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976       -0.006144768000000000       19900.000000000000000000 Account #2 - Property Owner 1
+ 0 0xa00af22d07c87d96eeeb0ed583f8f6ac7812827e        0.080309394000000000           0.000000000000000000 Account #0 - Miner
+ 1 0xa11aae29840fbb5c86e6fd4cf809eba183aef433       -0.073336402000000000   499920000.000000000000000000 Account #1 - Contract Owner/Admin
+ 2 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976       -0.006972992000000000       19900.000000000000000000 Account #2 - Property Owner 1
  3 0xa33a6c312d9ad0e0f2e95541beed0cc081621fd0        0.000000000000000000       20000.000000000000000000 Account #3 - Property Owner 2
  4 0xa44a08d3f6933c69212114bb66e2df1813651844        0.000000000000000000       20000.000000000000000000 Account #4 - Renter 1
  5 0xa55a151eb00fded1634d27d1127b4be4627079ea        0.000000000000000000       20000.000000000000000000 Account #5 - Renter 2
@@ -108,28 +111,30 @@ PASS listingTx1b
  9 0xa99a0ae3354c06b1459fd441a32a3f71005d7da0        0.000000000000000000           0.000000000000000000 Account #9
 10 0xaaaa9de1e6c564446ebca0fd102d8bd92093c756        0.000000000000000000           0.000000000000000000 Account #10
 11 0xabba43e7594e3b76afb157989e93c6621497fd4b        0.000000000000000000           0.000000000000000000 Account #11
-12 0x0705aa935d1e8b988c6b7d9ab19f9e46bcaf7a8e        0.000000000000000000           0.000000000000000000 token
-13 0x3526747b4794e2e9200c8e150ecedb735833b047        0.000000000000000000         100.000000000000000000 Property Token
+12 0x79db4594726512dfd46cc32fa291b2eb8de9b3b1        0.000000000000000000           0.000000000000000000 token
+13 0xf42e922b9a245cc6fda2f1291b2937f4af790a82        0.000000000000000000         100.000000000000000000 Property Token
 -- ------------------------------------------ --------------------------- ------------------------------ ---------------------------
                                                                             500000000.000000000000000000 Total Token Balances
 -- ------------------------------------------ --------------------------- ------------------------------ ---------------------------
 
 PropertyToken.ownerOf(propertyHashUint1) = 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976
-propertyToken.properties[0]=0x7e86fbcc4bc9c89261314c3d716892590e1cee236f7b98de954c79210593b107 owned by: 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976 [true, 0, '0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976', '96/71 Victoria Street, Potts Point NSW 2011', 'Apartment and unit', 3, 2, 1, 'city and harbour view', '2018-06-30 21:27:42']
+propertyToken.properties[0]=0x7e86fbcc4bc9c89261314c3d716892590e1cee236f7b98de954c79210593b107 owned by: 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976 [true, 0, '0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976', '96/71 Victoria Street, Potts Point NSW 2011', 'Apartment and unit', 3, 2, 1, 'city and harbour view', '2018-07-01 13:21:35', 2200, 0x0000000000000000000000000000000000000000]
 
 ----- Owner 2 adds property 2 to the smart contract -----
 propertyHashJS2 = 0xff8f113d8cbc95ea259ea407f167f9fadc0c2d79e7866f4dc479b1c6925cc256
 PASS listingTx2a
 PASS listingTx2b
+listingTx2a status=0x1 Success gas=500000 gasUsed=45611 costETH=0.000775387 costUSD=0.35025006177 @ ETH/USD=451.71 gasPrice=17 gwei block=9289 txIx=0 txId=0x41fada401d889f448a89126a3c9349b8f8fe1efdc80c8e63da732584914ae2ee @ 1530415285 Sun, 01 Jul 2018 03:21:25 UTC
+listingTx2b status=0x1 Success gas=500000 gasUsed=349117 costETH=0.005934989 costUSD=2.68089388119 @ ETH/USD=451.71 gasPrice=17 gwei block=9291 txIx=0 txId=0xa50b7c9fa01c590934957100a814806650f2389b63c77bf80c2a512cfa5900c2 @ 1530415287 Sun, 01 Jul 2018 03:21:27 UTC
 PropertyToken.ownerOf(propertyHashUint2) = 0xa33a6c312d9ad0e0f2e95541beed0cc081621fd0
-propertyToken.properties[0]=0x7e86fbcc4bc9c89261314c3d716892590e1cee236f7b98de954c79210593b107 owned by: 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976 [true, 0, '0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976', '96/71 Victoria Street, Potts Point NSW 2011', 'Apartment and unit', 3, 2, 1, 'city and harbour view', '2018-06-30 21:27:42']
-propertyToken.properties[1]=0xff8f113d8cbc95ea259ea407f167f9fadc0c2d79e7866f4dc479b1c6925cc256 owned by: 0xa33a6c312d9ad0e0f2e95541beed0cc081621fd0 [true, 1, '0xa33a6c312d9ad0e0f2e95541beed0cc081621fd0', '136 Raglan Street, Mosman NSW 2088', 'House', 5, 3, 2, 'Swimming Pool - Inground', '2018-09-28 21:27:29']
+propertyToken.properties[0]=0x7e86fbcc4bc9c89261314c3d716892590e1cee236f7b98de954c79210593b107 owned by: 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976 [true, 0, '0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976', '96/71 Victoria Street, Potts Point NSW 2011', 'Apartment and unit', 3, 2, 1, 'city and harbour view', '2018-07-01 13:21:35', 2200, 0x0000000000000000000000000000000000000000]
+propertyToken.properties[1]=0xff8f113d8cbc95ea259ea407f167f9fadc0c2d79e7866f4dc479b1c6925cc256 owned by: 0xa33a6c312d9ad0e0f2e95541beed0cc081621fd0 [true, 1, '0xa33a6c312d9ad0e0f2e95541beed0cc081621fd0', '136 Raglan Street, Mosman NSW 2088', 'House', 5, 3, 2, 'Swimming Pool - Inground', '2018-09-29 13:21:23', 2200, 0x0000000000000000000000000000000000000000]
  # Account                                             EtherBalanceChange                          Token Name
 -- ------------------------------------------ --------------------------- ------------------------------ ---------------------------
- 0 0xa00af22d07c87d96eeeb0ed583f8f6ac7812827e        0.071073568000000000           0.000000000000000000 Account #0 - Miner
- 1 0xa11aae29840fbb5c86e6fd4cf809eba183aef433       -0.059031200000000000   499920000.000000000000000000 Account #1 - Contract Owner/Admin
- 2 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976       -0.006144768000000000       19900.000000000000000000 Account #2 - Property Owner 1
- 3 0xa33a6c312d9ad0e0f2e95541beed0cc081621fd0       -0.005897600000000000       19900.000000000000000000 Account #3 - Property Owner 2
+ 0 0xa00af22d07c87d96eeeb0ed583f8f6ac7812827e        0.087019770000000000           0.000000000000000000 Account #0 - Miner
+ 1 0xa11aae29840fbb5c86e6fd4cf809eba183aef433       -0.073336402000000000   499920000.000000000000000000 Account #1 - Contract Owner/Admin
+ 2 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976       -0.006972992000000000       19900.000000000000000000 Account #2 - Property Owner 1
+ 3 0xa33a6c312d9ad0e0f2e95541beed0cc081621fd0       -0.006710376000000000       19900.000000000000000000 Account #3 - Property Owner 2
  4 0xa44a08d3f6933c69212114bb66e2df1813651844        0.000000000000000000       20000.000000000000000000 Account #4 - Renter 1
  5 0xa55a151eb00fded1634d27d1127b4be4627079ea        0.000000000000000000       20000.000000000000000000 Account #5 - Renter 2
  6 0xa66a85ede0cbe03694aa9d9de0bb19c99ff55bd9        0.000000000000000000           0.000000000000000000 Account #6 - Airdrop
@@ -138,8 +143,8 @@ propertyToken.properties[1]=0xff8f113d8cbc95ea259ea407f167f9fadc0c2d79e7866f4dc4
  9 0xa99a0ae3354c06b1459fd441a32a3f71005d7da0        0.000000000000000000           0.000000000000000000 Account #9
 10 0xaaaa9de1e6c564446ebca0fd102d8bd92093c756        0.000000000000000000           0.000000000000000000 Account #10
 11 0xabba43e7594e3b76afb157989e93c6621497fd4b        0.000000000000000000           0.000000000000000000 Account #11
-12 0x0705aa935d1e8b988c6b7d9ab19f9e46bcaf7a8e        0.000000000000000000           0.000000000000000000 token
-13 0x3526747b4794e2e9200c8e150ecedb735833b047        0.000000000000000000         200.000000000000000000 Property Token
+12 0x79db4594726512dfd46cc32fa291b2eb8de9b3b1        0.000000000000000000           0.000000000000000000 token
+13 0xf42e922b9a245cc6fda2f1291b2937f4af790a82        0.000000000000000000         200.000000000000000000 Property Token
 -- ------------------------------------------ --------------------------- ------------------------------ ---------------------------
                                                                             500000000.000000000000000000 Total Token Balances
 -- ------------------------------------------ --------------------------- ------------------------------ ---------------------------
@@ -148,28 +153,32 @@ propertyToken.properties[1]=0xff8f113d8cbc95ea259ea407f167f9fadc0c2d79e7866f4dc4
 ----- Owner 2 transfers property 2 to owner 1 -----
 propertyHashJS2 = 0xff8f113d8cbc95ea259ea407f167f9fadc0c2d79e7866f4dc479b1c6925cc256
 PASS listingTx3
-propertyToken.properties[0]=0x7e86fbcc4bc9c89261314c3d716892590e1cee236f7b98de954c79210593b107 owned by: 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976 [true, 0, '0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976', '96/71 Victoria Street, Potts Point NSW 2011', 'Apartment and unit', 3, 2, 1, 'city and harbour view', '2018-06-30 21:27:42']
-propertyToken.properties[1]=0xff8f113d8cbc95ea259ea407f167f9fadc0c2d79e7866f4dc479b1c6925cc256 owned by: 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976 [true, 1, '0xa33a6c312d9ad0e0f2e95541beed0cc081621fd0', '136 Raglan Street, Mosman NSW 2088', 'House', 5, 3, 2, 'Swimming Pool - Inground', '2018-09-28 21:27:29']
+listingTx3 status=0x1 Success gas=500000 gasUsed=40937 costETH=0.000695929 costUSD=0.31435808859 @ ETH/USD=451.71 gasPrice=17 gwei block=9295 txIx=0 txId=0xad056decc10126585f5d52afc7e3b3e04823011d0931208a0a854c747d585ebd @ 1530415291 Sun, 01 Jul 2018 03:21:31 UTC
+propertyToken.properties[0]=0x7e86fbcc4bc9c89261314c3d716892590e1cee236f7b98de954c79210593b107 owned by: 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976 [true, 0, '0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976', '96/71 Victoria Street, Potts Point NSW 2011', 'Apartment and unit', 3, 2, 1, 'city and harbour view', '2018-07-01 13:21:35', 2200, 0x0000000000000000000000000000000000000000]
+propertyToken.properties[1]=0xff8f113d8cbc95ea259ea407f167f9fadc0c2d79e7866f4dc479b1c6925cc256 owned by: 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976 [true, 1, '0xa33a6c312d9ad0e0f2e95541beed0cc081621fd0', '136 Raglan Street, Mosman NSW 2088', 'House', 5, 3, 2, 'Swimming Pool - Inground', '2018-09-29 13:21:23', 2200, 0x0000000000000000000000000000000000000000]
 
 ----- Owner 2 cannot remove property 2 -----
 propertyHashJS2 = 0xff8f113d8cbc95ea259ea407f167f9fadc0c2d79e7866f4dc479b1c6925cc256
 PASS listingTx4
-propertyToken.properties[0]=0x7e86fbcc4bc9c89261314c3d716892590e1cee236f7b98de954c79210593b107 owned by: 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976 [true, 0, '0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976', '96/71 Victoria Street, Potts Point NSW 2011', 'Apartment and unit', 3, 2, 1, 'city and harbour view', '2018-06-30 21:27:42']
-propertyToken.properties[1]=0xff8f113d8cbc95ea259ea407f167f9fadc0c2d79e7866f4dc479b1c6925cc256 owned by: 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976 [true, 1, '0xa33a6c312d9ad0e0f2e95541beed0cc081621fd0', '136 Raglan Street, Mosman NSW 2088', 'House', 5, 3, 2, 'Swimming Pool - Inground', '2018-09-28 21:27:29']
+listingTx4 status=0x0 Failure gas=500000 gasUsed=24514 costETH=0.000416738 costUSD=0.18824472198 @ ETH/USD=451.71 gasPrice=17 gwei block=9297 txIx=0 txId=0xd09335997df6ff72cf7e4b111557a0be45fd06f5bda9a7a5f78959078467d605 @ 1530415293 Sun, 01 Jul 2018 03:21:33 UTC
+propertyToken.properties[0]=0x7e86fbcc4bc9c89261314c3d716892590e1cee236f7b98de954c79210593b107 owned by: 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976 [true, 0, '0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976', '96/71 Victoria Street, Potts Point NSW 2011', 'Apartment and unit', 3, 2, 1, 'city and harbour view', '2018-07-01 13:21:35', 2200, 0x0000000000000000000000000000000000000000]
+propertyToken.properties[1]=0xff8f113d8cbc95ea259ea407f167f9fadc0c2d79e7866f4dc479b1c6925cc256 owned by: 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976 [true, 1, '0xa33a6c312d9ad0e0f2e95541beed0cc081621fd0', '136 Raglan Street, Mosman NSW 2088', 'House', 5, 3, 2, 'Swimming Pool - Inground', '2018-09-29 13:21:23', 2200, 0x0000000000000000000000000000000000000000]
 
 ----- Owner 1 removes property 2 -----
 propertyHashJS2 = 0xff8f113d8cbc95ea259ea407f167f9fadc0c2d79e7866f4dc479b1c6925cc256
 PASS listingTx1
-propertyToken.properties[0]=0x7e86fbcc4bc9c89261314c3d716892590e1cee236f7b98de954c79210593b107 owned by: 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976 [true, 0, '0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976', '96/71 Victoria Street, Potts Point NSW 2011', 'Apartment and unit', 3, 2, 1, 'city and harbour view', '2018-06-30 21:27:42']
+listingTx5 status=0x1 Success gas=500000 gasUsed=61738 costETH=0.001049546 costUSD=0.47409042366 @ ETH/USD=451.71 gasPrice=17 gwei block=9299 txIx=0 txId=0xc936618d552f66248db46929010332c53d914b058c264b31b7c1ac9d47b75a17 @ 1530415295 Sun, 01 Jul 2018 03:21:35 UTC
+propertyToken.properties[0]=0x7e86fbcc4bc9c89261314c3d716892590e1cee236f7b98de954c79210593b107 owned by: 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976 [true, 0, '0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976', '96/71 Victoria Street, Potts Point NSW 2011', 'Apartment and unit', 3, 2, 1, 'city and harbour view', '2018-07-01 13:21:35', 2200, 0x0000000000000000000000000000000000000000]
 
 ----- Owner 1 updates next available date for property 1 -----
-future = 2018-07-30 21:27:41
+future = 2018-07-31 13:21:35
 PASS listingTx6
-listingTx6 status=0x1 Success gas=500000 gasUsed=30023 costETH=0.000480368 costUSD=0.32458946128 @ ETH/USD=675.71 gasPrice=16 gwei block=18568 txIx=0 txId=0x9b3d036feb7759bc0284df9d5215821387d6957dd1a40806f630f7ae7549e723 @ 1530358063 Sat, 30 Jun 2018 11:27:43 UTC
-propertyToken.properties[0]=0x7e86fbcc4bc9c89261314c3d716892590e1cee236f7b98de954c79210593b107 owned by: 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976 [true, 0, '0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976', '96/71 Victoria Street, Potts Point NSW 2011', 'Apartment and unit', 3, 2, 1, 'city and harbour view', '2018-07-30 21:27:41']
+listingTx6 status=0x1 Success gas=500000 gasUsed=30111 costETH=0.000511887 costUSD=0.23122447677 @ ETH/USD=451.71 gasPrice=17 gwei block=9301 txIx=0 txId=0xc1ed903544f38d58bce68c2cd96320e9e9412982f1a81659cb26bc44e5c32c7f @ 1530415297 Sun, 01 Jul 2018 03:21:37 UTC
+listingTx6 status=0x1 Success gas=500000 gasUsed=30111 costETH=0.000511887 costUSD=0.23122447677 @ ETH/USD=451.71 gasPrice=17 gwei block=9301 txIx=0 txId=0xc1ed903544f38d58bce68c2cd96320e9e9412982f1a81659cb26bc44e5c32c7f @ 1530415297 Sun, 01 Jul 2018 03:21:37 UTC
+propertyToken.properties[0]=0x7e86fbcc4bc9c89261314c3d716892590e1cee236f7b98de954c79210593b107 owned by: 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976 [true, 0, '0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976', '96/71 Victoria Street, Potts Point NSW 2011', 'Apartment and unit', 3, 2, 1, 'city and harbour view', '2018-07-31 13:21:35', 2200, 0x0000000000000000000000000000000000000000]
 
 ----- Owner 1 updates property data -----
 PASS listingTx7
-listingTx7 status=0x1 Success gas=5000000 gasUsed=94917 costETH=0.001518672 costUSD=1.02618185712 @ ETH/USD=675.71 gasPrice=16 gwei block=18570 txIx=0 txId=0xa2ebc25633d6e84913536cddc4a106ea260e5b187cf8aa93459592392b7a15b7 @ 1530358065 Sat, 30 Jun 2018 11:27:45 UTC
-propertyToken.properties[0]=0x7e86fbcc4bc9c89261314c3d716892590e1cee236f7b98de954c79210593b107 owned by: 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976 [true, 0, '0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976', '96/71 Victoria Street, Potts Point NSW 2011', 'Apartment and unit', 3, 3, 2, 'city and harbour view, school zone', '2018-07-30 21:27:41']
+listingTx7 status=0x1 Success gas=5000000 gasUsed=122931 costETH=0.002089827 costUSD=0.94399575417 @ ETH/USD=451.71 gasPrice=17 gwei block=9303 txIx=0 txId=0x29a17f1071a7679a54049ea7d94ce76d25cfeef4260be202bdf5177ab9b354a5 @ 1530415299 Sun, 01 Jul 2018 03:21:39 UTC
+propertyToken.properties[0]=0x7e86fbcc4bc9c89261314c3d716892590e1cee236f7b98de954c79210593b107 owned by: 0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976 [true, 0, '0xa22ab8a9d641ce77e06d98b7d7065d324d3d6976', '96/71 Victoria Street, Potts Point NSW 2011', 'Apartment and unit', 3, 3, 2, 'city and harbour view, school zone', '2018-07-31 13:21:35', 2500, 0xa44a08d3f6933c69212114bb66e2df1813651844]
 

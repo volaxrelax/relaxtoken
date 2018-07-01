@@ -145,7 +145,8 @@ var propertyTokenContract = web3.eth.contract(propertyTokenAbi);
 console.log(JSON.stringify(propertyTokenContract));
 var propertyTokenTx = null;
 var propertyTokenAddress = null;
-var propertyToken = propertyTokenContract.new(tokenAddress, new BigNumber("100").shift(18), {from: contractOwnerAccount, data: propertyTokenBin, gas: 6000000, gasPrice: defaultGasPrice},
+var minRentTime = 3600*24; // Minimum 1 day;
+var propertyToken = propertyTokenContract.new(tokenAddress, new BigNumber("100").shift(18), minRentTime, {from: contractOwnerAccount, data: propertyTokenBin, gas: 6000000, gasPrice: defaultGasPrice},
   function(e, contract) {
     console.log(e);
     if (!e) {
@@ -191,6 +192,7 @@ failIfTxStatusError(transferTokensTx1, " - transfer 20000 tokens to owner 1");
 failIfTxStatusError(transferTokensTx2, " - transfer 20000 tokens to owner 2");
 failIfTxStatusError(transferTokensTx3, " - transfer 20000 tokens to retner 1");
 failIfTxStatusError(transferTokensTx4, " - transfer 20000 tokens to renter 2");
+printTxData("transferTokensTx1", transferTokensTx1);
 console.log("RESULT: ");
 
 printBalances();
@@ -219,11 +221,14 @@ console.log("RESULT: propertyHashJS1 = " + propertyHashJS1);
 var listingTx1a = token.approve(propertyTokenAddress, new BigNumber("200").shift(18), {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
 }
-var listingTx1b = propertyToken.addProperty(propertyOwner1, propertyLocation1, propertyType, bedrooms, bathrooms, garageSpaces, comments, nextAvailableDate, {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
+var listingTx1b = propertyToken.addProperty(propertyOwner1, propertyLocation1, propertyType, bedrooms, bathrooms, garageSpaces, comments, nextAvailableDate, new BigNumber("2200").shift(18), 0x0, {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
 }
 failIfTxStatusError(listingTx1a, "listingTx1a");
 failIfTxStatusError(listingTx1b, "listingTx1b");
+printTxData("listingTx1a", listingTx1a);
+printTxData("listingTx1b", listingTx1b);
+
 
 printBalances();
 
@@ -257,11 +262,14 @@ console.log("RESULT: propertyHashJS2 = " + propertyHashJS2);
 var listingTx2a = token.approve(propertyTokenAddress, new BigNumber("200").shift(18), {from: owner2Account, gas: 500000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
 }
-var listingTx2b = propertyToken.addProperty(propertyOwner2, propertyLocation2, propertyType, bedrooms, bathrooms, garageSpaces, comments, nextAvailableDate, {from: owner2Account, gas: 500000, gasPrice: defaultGasPrice});
+var listingTx2b = propertyToken.addProperty(propertyOwner2, propertyLocation2, propertyType, bedrooms, bathrooms, garageSpaces, comments, nextAvailableDate, new BigNumber("2200").shift(18), 0x0, {from: owner2Account, gas: 500000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
 }
 failIfTxStatusError(listingTx2a, "listingTx2a");
 failIfTxStatusError(listingTx2b, "listingTx2b");
+printTxData("listingTx2a", listingTx2a);
+printTxData("listingTx2b", listingTx2b);
+
 var propertyHashUint2 = propertyToken.hashToInt(propertyHashJS2);
 // var propertyHashUint2_ = new BigNumber(propertyHashJS2.substring(2), 16);
 var propertyHashUint2_ = hexToInt(propertyHashJS2);
@@ -287,6 +295,7 @@ var listingTx3 = propertyToken.safeTransferFrom(propertyOwner2, propertyOwner1, 
 while (txpool.status.pending > 0) {
 }
 failIfTxStatusError(listingTx3, "listingTx3");
+printTxData("listingTx3", listingTx3);
 // console.log("RESULT: After transfer: propertyToken.ownerOf(propertyHashUint2) = " + propertyToken.ownerOf(propertyHashUint2_));
 // console.log("RESULT: After transfer: propertyToken.balanceOf(propertyOwner1) = " + propertyToken.balanceOf(propertyOwner1));
 // console.log("RESULT: After transfer: propertyToken.balanceOf(propertyOwner2) = " + propertyToken.balanceOf(propertyOwner2));
@@ -307,6 +316,7 @@ var listingTx4 = propertyToken.removeProperty(propertyHashJS2, {from: owner2Acco
 while (txpool.status.pending > 0) {
 }
 passIfTxStatusError(listingTx4, "listingTx4");
+printTxData("listingTx4", listingTx4);
 // console.log("RESULT: After removal: propertyToken.ownerOf(propertyHashUint2_) = " + propertyToken.ownerOf(propertyHashUint2_));
 // console.log("RESULT: After removal: propertyToken.balanceOf(propertyOwner1) = " + propertyToken.balanceOf(propertyOwner1));
 // console.log("RESULT: After removal: propertyToken.balanceOf(propertyOwner2) = " + propertyToken.balanceOf(propertyOwner2));
@@ -327,6 +337,7 @@ var listingTx5 = propertyToken.removeProperty(propertyHashJS2, {from: owner1Acco
 while (txpool.status.pending > 0) {
 }
 failIfTxStatusError(listingTx5, "listingTx1");
+printTxData("listingTx5", listingTx5);
 // console.log("RESULT: After removal: propertyToken.ownerOf(propertyHashUint2_) = " + propertyToken.ownerOf(propertyHashUint2_));
 // console.log("RESULT: After removal: propertyToken.balanceOf(propertyOwner1) = " + propertyToken.balanceOf(propertyOwner1));
 // console.log("RESULT: After removal: propertyToken.balanceOf(propertyOwner2) = " + propertyToken.balanceOf(propertyOwner2));
@@ -347,7 +358,7 @@ var listingTx6 = propertyToken.updateNextAvailableDate(propertyHashJS1, future, 
 while (txpool.status.pending > 0) {
 }
 failIfTxStatusError(listingTx6, "listingTx6");
-
+printTxData("listingTx6", listingTx6);
 // printBalances();
 
 var propertyData = propertyToken.getPropertyData(propertyHashJS);
@@ -369,11 +380,10 @@ var bathrooms = 3;
 var garageSpaces = 2;
 var comments = "city and harbour view, school zone";
 
-var listingTx7 = propertyToken.updatePropertyData(propertyHashJS1, propertyType, bedrooms, bathrooms, garageSpaces, comments, {from: owner1Account, gas: 5000000, gasPrice: defaultGasPrice});
+var listingTx7 = propertyToken.updatePropertyData(propertyHashJS1, propertyType, bedrooms, bathrooms, garageSpaces, comments, new BigNumber("2500").shift(18), renter1Account, {from: owner1Account, gas: 5000000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
 }
 failIfTxStatusError(listingTx7, "listingTx7");
-
 printTxData("listingTx7", listingTx7);
 printPropertyTokenContractDetails();
 // printBalances();
