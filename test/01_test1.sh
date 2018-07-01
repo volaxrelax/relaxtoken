@@ -358,10 +358,9 @@ var listingTx6 = propertyToken.updateNextAvailableDate(propertyHashJS1, future, 
 while (txpool.status.pending > 0) {
 }
 failIfTxStatusError(listingTx6, "listingTx6");
-printTxData("listingTx6", listingTx6);
 // printBalances();
 
-var propertyData = propertyToken.getPropertyData(propertyHashJS);
+var propertyData = propertyToken.getPropertyData(propertyHashJS1);
 var nextAvailableDateStr = timestampToStr(propertyData[9]);
 
 printTxData("listingTx6", listingTx6);
@@ -390,7 +389,87 @@ printPropertyTokenContractDetails();
 
 console.log("RESULT: ");
 
+
+// -----------------------------------------------------------------------------
+var msg = "Owner 1 updates property data";
+// -----------------------------------------------------------------------------
+console.log("RESULT: ----- " + msg + " -----");
+
+var propertyType = 1; // apartment
+var bedrooms = 3;
+var bathrooms = 3;
+var garageSpaces = 2;
+var comments = "city and harbour view, school zone";
+
+var listingTx7 = propertyToken.updatePropertyData(propertyHashJS1, propertyType, bedrooms, bathrooms, garageSpaces, comments, new BigNumber("2500").shift(18), renter1Account, {from: owner1Account, gas: 5000000, gasPrice: defaultGasPrice});
+while (txpool.status.pending > 0) {
+}
+failIfTxStatusError(listingTx7, "listingTx7");
+printTxData("listingTx7", listingTx7);
+printPropertyTokenContractDetails();
+// printBalances();
+
+console.log("RESULT: ");
+
+
+// -----------------------------------------------------------------------------
+var msg = "Renter 1 reserves the property for a period";
+// -----------------------------------------------------------------------------
+console.log("RESULT: ----- " + msg + " -----");
+var rentalStart = parseInt(now/1000) + (30*24*60*60);
+var rentalEnd = parseInt(now/1000) + (31*24*60*60);
+
+var rentingTx1a = token.approve(propertyTokenAddress, new BigNumber("2500").shift(18), {from: renter1Account, gas: 500000, gasPrice: defaultGasPrice});
+while (txpool.status.pending > 0) {
+}
+var rentingTx1b = propertyToken.reserve(propertyHashUint1, new BigNumber("2500").shift(18), rentalStart, rentalEnd, {from: owner1Account, gas: 6000000, gasPrice: defaultGasPrice});
+while (txpool.status.pending > 0) {
+}
+failIfTxStatusError(rentingTx1a, "rentingTx1a");
+failIfTxStatusError(rentingTx1b, "rentingTx1b");
+printTxData("rentingTx1a", rentingTx1a);
+printTxData("rentingTx1b", rentingTx1b);
+
+printPropertyTokenContractDetails();
+printBalances();
+
+console.log("RESULT: ");
+
 exit;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // -----------------------------------------------------------------------------
 var deployPropertiesLibMessage = "Deploy Properties Library";
@@ -715,7 +794,7 @@ var msg = "Owner 2 removes the property";
 // -----------------------------------------------------------------------------
 console.log("RESULT: ----- " + msg + " -----");
 
-var listingTx4b = uhood.removeProperty(propertyHashJS2, {from: owner2Account, gas: 500000, gasPrice: defaultGasPrice});
+var listingTx4b = uhood.removeProperty(propertyHashJS2, {from: owner2Account, gas: 6000000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
 }
 failIfTxStatusError(listingTx4b, "listingTx4b");
