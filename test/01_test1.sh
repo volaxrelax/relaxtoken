@@ -221,7 +221,7 @@ console.log("RESULT: propertyHashJS1 = " + propertyHashJS1);
 var listingTx1a = token.approve(propertyTokenAddress, new BigNumber("200").shift(18), {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
 }
-var listingTx1b = propertyToken.addProperty(propertyOwner1, propertyLocation1, propertyType, bedrooms, bathrooms, garageSpaces, comments, nextAvailableDate, new BigNumber("2200").shift(18), 0x0, {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
+var listingTx1b = propertyToken.addProperty(propertyOwner1, propertyLocation1, propertyType, bedrooms, bathrooms, garageSpaces, comments, nextAvailableDate, new BigNumber("123").shift(18), 0x0, {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
 }
 failIfTxStatusError(listingTx1a, "listingTx1a");
@@ -262,7 +262,7 @@ console.log("RESULT: propertyHashJS2 = " + propertyHashJS2);
 var listingTx2a = token.approve(propertyTokenAddress, new BigNumber("200").shift(18), {from: owner2Account, gas: 500000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
 }
-var listingTx2b = propertyToken.addProperty(propertyOwner2, propertyLocation2, propertyType, bedrooms, bathrooms, garageSpaces, comments, nextAvailableDate, new BigNumber("2200").shift(18), 0x0, {from: owner2Account, gas: 500000, gasPrice: defaultGasPrice});
+var listingTx2b = propertyToken.addProperty(propertyOwner2, propertyLocation2, propertyType, bedrooms, bathrooms, garageSpaces, comments, nextAvailableDate, new BigNumber("456").shift(18), 0x0, {from: owner2Account, gas: 500000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
 }
 failIfTxStatusError(listingTx2a, "listingTx2a");
@@ -379,7 +379,7 @@ var bathrooms = 3;
 var garageSpaces = 2;
 var comments = "city and harbour view, school zone";
 
-var listingTx7 = propertyToken.updatePropertyData(propertyHashJS1, propertyType, bedrooms, bathrooms, garageSpaces, comments, new BigNumber("2500").shift(18), renter1Account, {from: owner1Account, gas: 5000000, gasPrice: defaultGasPrice});
+var listingTx7 = propertyToken.updatePropertyData(propertyHashJS1, propertyType, bedrooms, bathrooms, garageSpaces, comments, new BigNumber("789").shift(18), renter1Account, {from: owner1Account, gas: 5000000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
 }
 failIfTxStatusError(listingTx7, "listingTx7");
@@ -391,38 +391,17 @@ console.log("RESULT: ");
 
 
 // -----------------------------------------------------------------------------
-var msg = "Owner 1 updates property data";
+var msg = "Renter 2 reserves the property for a period";
 // -----------------------------------------------------------------------------
 console.log("RESULT: ----- " + msg + " -----");
+// var rentalStart = parseInt(now/1000) + (30*24*60*60);
+var rentalStart = parseInt(now/1000);
+var rentalEnd = parseInt(now/1000) + (210*24*60*60);
 
-var propertyType = 1; // apartment
-var bedrooms = 3;
-var bathrooms = 3;
-var garageSpaces = 2;
-var comments = "city and harbour view, school zone";
-
-var listingTx7 = propertyToken.updatePropertyData(propertyHashJS1, propertyType, bedrooms, bathrooms, garageSpaces, comments, new BigNumber("2500").shift(18), renter1Account, {from: owner1Account, gas: 5000000, gasPrice: defaultGasPrice});
+var rentingTx1a = token.approve(propertyTokenAddress, new BigNumber("1000").shift(18), {from: renter2Account, gas: 500000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
 }
-failIfTxStatusError(listingTx7, "listingTx7");
-printTxData("listingTx7", listingTx7);
-printPropertyTokenContractDetails();
-// printBalances();
-
-console.log("RESULT: ");
-
-
-// -----------------------------------------------------------------------------
-var msg = "Renter 1 reserves the property for a period";
-// -----------------------------------------------------------------------------
-console.log("RESULT: ----- " + msg + " -----");
-var rentalStart = parseInt(now/1000) + (30*24*60*60);
-var rentalEnd = parseInt(now/1000) + (31*24*60*60);
-
-var rentingTx1a = token.approve(propertyTokenAddress, new BigNumber("2500").shift(18), {from: renter1Account, gas: 500000, gasPrice: defaultGasPrice});
-while (txpool.status.pending > 0) {
-}
-var rentingTx1b = propertyToken.reserve(propertyHashUint1, new BigNumber("2500").shift(18), rentalStart, rentalEnd, {from: owner1Account, gas: 6000000, gasPrice: defaultGasPrice});
+var rentingTx1b = propertyToken.reserve(propertyHashUint1, rentalStart, rentalEnd, {from: renter2Account, gas: 6000000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
 }
 failIfTxStatusError(rentingTx1a, "rentingTx1a");
@@ -432,7 +411,25 @@ printTxData("rentingTx1b", rentingTx1b);
 
 printPropertyTokenContractDetails();
 printBalances();
+console.log("RESULT: ");
 
+
+// -----------------------------------------------------------------------------
+var msg = "Renter 2 accesses the property";
+// -----------------------------------------------------------------------------
+console.log("RESULT: ----- " + msg + " -----");
+var rentalStart = parseInt(now/1000) + (30*24*60*60);
+
+var rentingTx2 = propertyToken.access(propertyHashUint1, {from: renter2Account, gas: 6000000, gasPrice: defaultGasPrice});
+while (txpool.status.pending > 0) {
+}
+failIfTxStatusError(rentingTx2, "rentingTx2");
+printTxData("rentingTx2", rentingTx2);
+
+printPropertyTokenContractDetails();
+printBalances();
+
+console.log("RESULT: bond is " + bond);
 console.log("RESULT: ");
 
 exit;

@@ -440,7 +440,7 @@ contract PropertyToken is ERC721BasicToken, Owned {
         return bytes32(_tokenId);
     }
 
-    function reserve(uint _tokenId, uint _tokensAsBond, uint _start, uint _stop)
+    function reserve(uint _tokenId, uint _start, uint _stop)
         external
         returns (bool)
     {
@@ -448,24 +448,33 @@ contract PropertyToken is ERC721BasicToken, Owned {
         bytes32 _propertyHash = bytes32(_tokenId);
         Property memory property = entries[_propertyHash];
 
+        uint _startIndex = _start.div(minRentTime);
+        uint _stopIndex = _stop.div(minRentTime);
+
         require(token.transferFrom(msg.sender, this, property.tokensAsBond));
-        bondTaken[msg.sender][_tokenId] = bondTaken[msg.sender][_tokenId].add(_tokensAsBond);
-        require(_start < _stop);
+        bondTaken[msg.sender][_tokenId] = bondTaken[msg.sender][_tokenId].add(property.tokensAsBond);
+        /* require(_start < _stop); */
 
         // check availability (for all dates in range)
-        for (uint i = _start; i <= _stop; i++) {
-            /* if (!_isAvailable(_tokenId, i)) {
+        for (uint i = _startIndex; i <= _stopIndex; i++) {
+            if (!_isAvailable(_tokenId, i)) {
                 return false;
-            } */
+            }
         }
 
         // make reservation
-        for (i = _start; i <= _stop; i++) {
+        for (i = _startIndex; i <= _stopIndex; i++) {
             reservations[_tokenId][i] = _renter;
         }
 
         return true;
     }
+
+    /* function getBond(uint _tokenId) public view returns (uint) {
+        bytes32 _propertyHash = bytes32(_tokenId);
+        Property memory property = entries[_propertyHash];
+        return property.tokensAsBond;
+    } */
 
     function access(uint _tokenId) public {
 
