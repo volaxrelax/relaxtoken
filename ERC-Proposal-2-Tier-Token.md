@@ -11,7 +11,7 @@ While the ERC-809 standard caters for rental rights, it does not tokenise them. 
 # Specification
 ---
 
-## Tier 1 Token - Ownership Rights - ERC-721 compatible
+## Tier 1 Ownership Token - ERC-721 compatible
 
 ### balanceOf
 
@@ -49,7 +49,7 @@ While the ERC-809 standard caters for rental rights, it does not tokenise them. 
 
     function isApprovedForAll(address owner, address operator) external view returns (bool);
 
-## Tier 2 Token - Rental Rights
+## Tier 2 Rental Token
 
 ### mintRental
 
@@ -57,8 +57,43 @@ While the ERC-809 standard caters for rental rights, it does not tokenise them. 
 
 The owner of the token `tokenId` mints rental tokens and assigns them to `renter`. The number of tokens minted is equal to `stopIndex - startIndex + 1`.
 
-`startIndex` and `stopIndex`
+The rental tokens are stored in a double mapping such as this:
 
-The rental tokens are stored in a double mapping such as
+    mapping(uint256 -> mapping(uint256 -> address)) rentals
 
-    mapping(uint256 -> mapping(uint256 -> address)) reservations
+The first uint256 stores the `tokenId`. The second uint256 represents the time slot index. Each time slot can be an any duration set at by the smart contract constructor. For example, it can be an hour for a bike rental contract and a day for a property rental contract.
+
+`startIndex` and `stopIndex` refers to the second uint256 above.
+
+### approveRentalTransfer
+
+    function approve(address approved, uint256 tokenId, uint256 startIndex, uint256 stopIndex) external returns (bool success)
+
+Approves `approved` (can be the current rental token owner, or a smart contract) to transfer rental tokens within the indices range `startIndex` and `stopIndex` to a third party.
+
+### rentalTransferFrom
+    function rentalTransferFrom(address from, address to, uint256 tokenId, uint256 startIndex, uint256 stopIndex) external returns (bool success)
+
+Transfers rental rights to a third party. This can be done by the current rental token owner, or a market place smart contract.
+
+### burnRental
+    function burnRental(address owner, uint256 tokenId, uint256 startIndex, uint256 stopIndex) external returns (bool success)
+
+When certain conditions are not met (e.g. paying rent regularly, keeping the properties in a good condition), and when necessary, approved by an arbitration panel, the owner of the token can burn rental tokens within the indices range `startIndex` and `stopIndex`, effectively withdrawing the rental rights.
+
+In another scenario, the current renter decides to move out early. Upon approval by the owner, the rental agreements are terminated early and the rental tokens are burnt.
+
+### rentalExists
+    function exists(uint256 tokenId, uint256 index) public view returns (bool)
+
+Check if a rental token exists at `index`
+
+### ownerOfRental
+    function ownerOfRental(uint256 tokenId, uint256 index) public view returns (address)
+
+Returns the owner of the rental token at `index`
+
+### balanceOfRental
+    function balanceOfRental(address owner, uint256 tokenId) public view returns (uint256)
+
+Returns the number of rental tokens owned by `owner`
