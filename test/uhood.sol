@@ -448,12 +448,12 @@ contract PropertyToken is ERC721BasicToken, Owned {
         bytes32 _propertyHash = bytes32(_tokenId);
         Property memory property = entries[_propertyHash];
 
-        uint _startIndex = _start.div(minRentTime);
-        uint _stopIndex = _stop.div(minRentTime);
-
+        require(_start < _stop);
         require(token.transferFrom(msg.sender, this, property.tokensAsBond));
         bondTaken[msg.sender][_tokenId] = bondTaken[msg.sender][_tokenId].add(property.tokensAsBond);
-        /* require(_start < _stop); */
+
+        uint _startIndex = _start.div(minRentTime);
+        uint _stopIndex = _stop.div(minRentTime);
 
         // check availability (for all dates in range)
         for (uint i = _startIndex; i <= _stopIndex; i++) {
@@ -469,12 +469,6 @@ contract PropertyToken is ERC721BasicToken, Owned {
 
         return true;
     }
-
-    /* function getBond(uint _tokenId) public view returns (uint) {
-        bytes32 _propertyHash = bytes32(_tokenId);
-        Property memory property = entries[_propertyHash];
-        return property.tokensAsBond;
-    } */
 
     function access(uint _tokenId) public {
 
@@ -504,18 +498,22 @@ contract PropertyToken is ERC721BasicToken, Owned {
 
     // @dev cancel reservation
     function cancelReservation(uint _tokenId, uint _start, uint _stop) external returns(bool){
-        // only cancle future reservations
-        require(_isFuture(_start));
-        require(_start < _stop);
 
-        // only room owner or renter address can cancel
+        require(_start < _stop);
+        // only cancle future reservations
+        uint _startIndex = _start.div(minRentTime);
+        uint _stopIndex = _stop.div(minRentTime);
+        require(_isFuture(_startIndex));
+
+
+        // only property owner or renter address can cancel
         if (ownerOf(_tokenId) != msg.sender) {
-            for (uint i = _start; i <= _stop; i++) {
+            for (uint i = _startIndex; i <= _stopIndex; i++) {
                 require(_getRenter(_tokenId, i) == msg.sender);
             }
         }
 
-        for (i = _start; i <= _stop; i++) {
+        for (i = _startIndex; i <= _stopIndex; i++) {
             delete reservations[_tokenId][i];
         }
 
@@ -523,8 +521,8 @@ contract PropertyToken is ERC721BasicToken, Owned {
     }
 
     // @dev lookup function
-    function checkAvailable(uint _tokenId, uint _start) public view returns (bool) {
-        return reservations[_tokenId][_start] == address(0);
+    function checkAvailable(uint _tokenId, uint _time) public view returns (bool) {
+        return reservations[_tokenId][_time] == address(0);
     }
 
     // @dev internal check if reservation date is _isFuture

@@ -384,11 +384,6 @@ contract PropertyToken is ERC721BasicToken, Owned {
         public
         onlyOwnerOf(uint(_propertyHash))
     {
-        /* require(_propertyType > 0 && _propertyType <= 6);
-        require(_bedrooms > 0 && _bedrooms <= 6);
-        require(_bathrooms > 0 && _bathrooms <= 6);
-        require(_garageSpaces > 0 && _garageSpaces <= 6); */
-        /* require(bytes(_comments).length > 0); */
         Property storage property = entries[_propertyHash];
         property.propertyType = _propertyType;
         property.bedrooms = _bedrooms;
@@ -448,12 +443,12 @@ contract PropertyToken is ERC721BasicToken, Owned {
         bytes32 _propertyHash = bytes32(_tokenId);
         Property memory property = entries[_propertyHash];
 
-        uint _startIndex = _start.div(minRentTime);
-        uint _stopIndex = _stop.div(minRentTime);
-
+        require(_start < _stop);
         require(token.transferFrom(msg.sender, this, property.tokensAsBond));
         bondTaken[msg.sender][_tokenId] = bondTaken[msg.sender][_tokenId].add(property.tokensAsBond);
-        /* require(_start < _stop); */
+
+        uint _startIndex = _start.div(minRentTime);
+        uint _stopIndex = _stop.div(minRentTime);
 
         // check availability (for all dates in range)
         for (uint i = _startIndex; i <= _stopIndex; i++) {
@@ -470,14 +465,7 @@ contract PropertyToken is ERC721BasicToken, Owned {
         return true;
     }
 
-    /* function getBond(uint _tokenId) public view returns (uint) {
-        bytes32 _propertyHash = bytes32(_tokenId);
-        Property memory property = entries[_propertyHash];
-        return property.tokensAsBond;
-    } */
-
     function access(uint _tokenId) public {
-
         uint256 _time = now.div(minRentTime);
 
         bytes32 _propertyHash = bytes32(_tokenId);
@@ -504,18 +492,22 @@ contract PropertyToken is ERC721BasicToken, Owned {
 
     // @dev cancel reservation
     function cancelReservation(uint _tokenId, uint _start, uint _stop) external returns(bool){
-        // only cancle future reservations
-        require(_isFuture(_start));
-        require(_start < _stop);
 
-        // only room owner or renter address can cancel
+        require(_start < _stop);
+        // only cancle future reservations
+        uint _startIndex = _start.div(minRentTime);
+        uint _stopIndex = _stop.div(minRentTime);
+        require(_isFuture(_startIndex));
+
+
+        // only property owner or renter address can cancel
         if (ownerOf(_tokenId) != msg.sender) {
-            for (uint i = _start; i <= _stop; i++) {
+            for (uint i = _startIndex; i <= _stopIndex; i++) {
                 require(_getRenter(_tokenId, i) == msg.sender);
             }
         }
 
-        for (i = _start; i <= _stop; i++) {
+        for (i = _startIndex; i <= _stopIndex; i++) {
             delete reservations[_tokenId][i];
         }
 
@@ -523,8 +515,8 @@ contract PropertyToken is ERC721BasicToken, Owned {
     }
 
     // @dev lookup function
-    function checkAvailable(uint _tokenId, uint _start) public view returns (bool) {
-        return reservations[_tokenId][_start] == address(0);
+    function checkAvailable(uint _tokenId, uint _time) public view returns (bool) {
+        return reservations[_tokenId][_time] == address(0);
     }
 
     // @dev internal check if reservation date is _isFuture
@@ -550,203 +542,6 @@ contract PropertyToken is ERC721BasicToken, Owned {
 }
 
 
-/* // ----------------------------------------------------------------------------
-// PropertyToken
-// ----------------------------------------------------------------------------
-contract PropertyToken is ERC809, ERC721Token {
-
-    struct Reservation {
-        address renter;
-        // total price
-        uint256 amount;
-        // access period
-        uint256 startTimestamp;
-        uint256 stopTimestamp;
-        // whether reservation has been settled
-        bool settled;
-    }
-
-    struct Token {
-        // iterable of all reservations
-        Reservation[] reservations;
-        // mapping from start and end timestamps for each reservation to reservation id
-        uint startTimestamps;
-        uint stopTimestamps;
-    }
-
-    // mapping of all tokens
-    mapping(uint => Token) public tokens;
-    // mapping of token owner's money
-    mapping(address => uint) public payouts;
-
-    constructor(uint _tokens) public ERC721Token("PropertyToken", "PRT") {
-        for (uint i = 0; i < _tokens; i++) {
-            super._mint(msg.sender, i);
-        }
-    }
-
-    /// @dev Guarantees msg.sender is owner of the given token
-    /// @param _tokenId uint256 ID of the token to validate its ownership belongs to msg.sender
-    modifier onlyRenterOf(uint256 _tokenId, uint256 _time) {
-        require(renterOf(_tokenId, _time) == msg.sender);
-        _;
-    }
-
-    /// @notice Find the renter of an NFT token as of `_time`
-    /// @dev The renter is who made a reservation on `_tokenId` and the reservation spans over `_time`.
-    function renterOf(uint256 _tokenId, uint256 _time)
-        public
-        view
-        returns(address)
-    {
-        Token storage token = tokens[_tokenId];
-        bool found;
-        uint256 startTime;
-        uint256 reservationId;
-        (found, startTime, reservationId) = token.startTimestamps.floorEntry(_time);
-        if (found) {
-            Reservation storage reservation = token.reservations[reservationId];
-            if (reservation.stopTimestamp > _time) {
-                return reservation.renter;
-            }
-        }
-    }
-
-  /// @notice Reserve access to token `_tokenId` from time `_start` to time `_stop`
-  /// @dev A successful reservation must ensure each time slot in the range _start to _stop
-  ///  is not previously reserved (by calling the function checkAvailable() described below)
-  ///  and then emit a Reserve event.
-    function reserve(uint256 _tokenId, uint256 _start, uint256 _stop)
-        external
-        payable
-        returns(bool success)
-    {
-        if (checkAvailable(_tokenId, _start, _stop)) {
-            Token storage token = tokens[_tokenId];
-            Reservation[] storage reservations = token.reservations;
-            uint id = reservations.length++;
-            reservations[id] = Reservation(msg.sender, msg.value, _start, _stop, false, "");
-            token.startTimestamps.put(_start, id);
-            token.stopTimestamps.put(_stop, id);
-            return true;
-        }
-    }
-
-    /// @notice Revoke access to token `_tokenId` from `_renter` and settle payments
-    /// @dev This function should be callable by either the owner of _tokenId or _renter,
-    ///  however, the owner should only be able to call this function if now >= _stop to
-    ///  prevent premature settlement of funds.
-    function settle(uint256 _tokenId, address _renter, uint256 _stop)
-        external
-        returns(bool success)
-    {
-        address tokenOwner = ownerOf(_tokenId);
-        // TODO: implement iterator in TreeMap for more efficient batch retrival
-        Token storage token = tokens[_tokenId];
-        Reservation[] storage reservations = token.reservations;
-
-        bool found = true;
-        uint stopTime = _stop;
-        uint reservationId;
-        while (found) {
-        // FIXME: a token should also have a `renter => stopTimestamps` mapping to skip
-        //   reservations that don't belong to a renter
-            (found, stopTime, reservationId) = token.stopTimestamps.ceilingEntry(stopTime);
-            Reservation storage reservation = reservations[reservationId];
-            if (found && !reservation.settled && reservation.renter == _renter) {
-                if (msg.sender == tokenOwner) {
-                    if (now < reservation.stopTimestamp) {
-                        revert("Reservation has yet completed and currently can only be settled by the renter!");
-                    }
-
-                    reservation.settled = true;
-                    payouts[tokenOwner] += reservation.amount;
-                    success = true;
-                } else if (msg.sender == _renter) {
-                    reservation.settled = true;
-                    payouts[tokenOwner] += reservation.amount;
-                    success = true;
-                }
-            }
-        }
-    }
-    /// @notice Query if token `_tokenId` if available to reserve between `_start` and `_stop` time
-    /// @dev For the requested token, we examine its current resertions, check
-    ///   1. whether the last reservation that has `startTime` before `_start` already ended before `_start`
-    ///                Okay                            Bad
-    ///           *startTime*   stopTime        *startTime*   stopTime
-    ///             |---------|                  |---------|
-    ///                          |-------               |-------
-    ///                          _start                 _start
-    ///   2. whether the soonest reservation that has `endTime` after `_end` will start after `_end`.
-    ///                Okay                            Bad
-    ///          startTime   *stopTime*         startTime   *stopTime*
-    ///             |---------|                  |---------|
-    ///    -------|                           -------|
-    ///           _stop                              _stop
-    ///
-    //   NB: reservation interval are [start time, stop time] i.e. closed on both ends.
-    function checkAvailable(uint256 _tokenId, uint256 _start, uint256 _stop)
-        public
-        view
-        returns(bool available)
-    {
-        Token storage token = tokens[_tokenId];
-        Reservation[] storage reservations = token.reservations;
-        if (reservations.length > 0) {
-            bool found;
-            uint reservationId;
-
-            uint stopTime;
-            (found, stopTime, reservationId) = token.stopTimestamps.floorEntry(_stop);
-            if (found && stopTime >= _start) {
-                return false;
-            }
-
-            uint startTime;
-            (found, startTime, reservationId) = token.startTimestamps.ceilingEntry(_start);
-            if (found && startTime <= _stop) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /// @notice Cancel reservation for `_tokenId` between `_start` and `_stop`
-    function cancelReservation(uint256 _tokenId, uint256 _start, uint256 _stop)
-        external
-        returns (bool success)
-    {
-        // TODO: implement iterator in TreeMap for more efficient batch removal
-        Token storage token = tokens[_tokenId];
-        Reservation[] storage reservations = token.reservations;
-
-        bool found = true;
-        uint startTime = _start;
-        uint stopTime;
-        uint reservationId;
-        // FIXME: a token should also have a `renter => startTimestamps` mapping to skip
-        //   reservations that don't belong to a renter more efficiently
-        (found, startTime, reservationId) = token.startTimestamps.ceilingEntry(startTime);
-        while (found) {
-            Reservation storage reservation = reservations[reservationId];
-            stopTime = reservation.stopTimestamp;
-            if (found) {
-                if (stopTime <= _stop && reservation.renter == msg.sender) {
-                    token.startTimestamps.remove(startTime);
-                    token.stopTimestamps.remove(stopTime);
-                    delete reservations[reservationId];
-
-                    success = true;
-                }
-
-                (found, startTime, reservationId) = token.startTimestamps.higherEntry(startTime);
-            }
-        }
-    }
-
-} */
 // ----------------------------------------------------------------------------
 // UhoodToken
 // ----------------------------------------------------------------------------

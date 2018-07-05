@@ -375,7 +375,7 @@ console.log("RESULT: ----- " + msg + " -----");
 
 var propertyType = 1; // apartment
 var bedrooms = 3;
-var bathrooms = 3;
+var bathrooms = 6;
 var garageSpaces = 2;
 var comments = "city and harbour view, school zone";
 
