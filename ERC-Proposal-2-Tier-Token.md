@@ -4,7 +4,7 @@ A two tiered token standard for non-fungible assets which tokenises both ownersh
 
 # Purpose
 ---
-This is an inspired by the [ERC-809 standard](https://github.com/ethereum/EIPs/issues/809) (Renting Standard for Rival, Non-Fungible Tokens), which is in turn an extension for the ERC-721 non-fungible token standard.
+This is inspired by the [ERC-809 standard](https://github.com/ethereum/EIPs/issues/809) (Renting Standard for Rival, Non-Fungible Tokens), which is an extension for the ERC-721 non-fungible token standard.
 
 While the ERC-809 standard caters for rental rights, it does not tokenise them. This standard aims to tokenise such rental rights and thus allow the rental rights to be easily exchanged between different parties.
 
@@ -76,24 +76,26 @@ Approves `approved` (can be the current rental token owner, or a smart contract)
 
 Transfers rental rights to a third party. This can be done by the current rental token owner, or a market place smart contract.
 
+This function allows a secondary market to be built to trade the rental rights (e.g. via auctions).
+
 ### burnRental
     function burnRental(address owner, uint256 tokenId, uint256 startIndex, uint256 stopIndex) external returns (bool success)
 
-When certain conditions are not met (e.g. paying rent regularly, keeping the properties in a good condition), and when necessary, approved by an arbitration panel, the owner of the token can burn rental tokens within the indices range `startIndex` and `stopIndex`, effectively withdrawing the rental rights.
+When certain conditions are not met (e.g. paying rent regularly, keeping the properties in a good condition), and when necessary, approved by an arbitration panel, the owner of the token can burn rental tokens within the indices range `startIndex` and `stopIndex`, effectively revoking the rental rights.
 
 In another scenario, the current renter decides to move out early. Upon approval by the owner, the rental agreements are terminated early and the rental tokens are burnt.
 
 ### rentalExists
     function exists(uint256 tokenId, uint256 index) public view returns (bool)
 
-Check if a rental token exists at `index`
+Check if a rental token exists at `index` for token `tokenId`.
 
 ### ownerOfRental
     function ownerOfRental(uint256 tokenId, uint256 index) public view returns (address)
 
-Returns the owner of the rental token at `index`
+Returns the owner of the rental token at `index` for token `tokenId`.
 
 ### balanceOfRental
     function balanceOfRental(address owner, uint256 tokenId) public view returns (uint256)
 
-Returns the number of rental tokens owned by `owner`
+Returns the number of rental tokens owned by `owner`.
