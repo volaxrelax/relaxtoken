@@ -443,7 +443,7 @@ contract PropertyToken is ERC721BasicToken, Owned {
         bytes32 _propertyHash = bytes32(_tokenId);
         Property memory property = entries[_propertyHash];
 
-        require(_start < _stop);
+        require(_start <= _stop);
         require(token.transferFrom(msg.sender, this, property.tokensAsBond));
         bondTaken[msg.sender][_tokenId] = bondTaken[msg.sender][_tokenId].add(property.tokensAsBond);
 
@@ -493,7 +493,7 @@ contract PropertyToken is ERC721BasicToken, Owned {
     // @dev cancel reservation
     function cancelReservation(uint _tokenId, uint _start, uint _stop) external returns(bool){
 
-        require(_start < _stop);
+        require(_start <= _stop);
         // only cancle future reservations
         uint _startIndex = _start.div(minRentTime);
         uint _stopIndex = _stop.div(minRentTime);

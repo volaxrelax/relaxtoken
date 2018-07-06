@@ -1,3 +1,11 @@
+>ERC:
+Title: Token standard
+Author: Zeming Yu
+Status: Draft
+Type: ERC-1201
+Created: 6 July 2018
+Recommended implementation: TBA
+
 # Summary
 ---
 A two tiered token standard for non-fungible assets which tokenises both ownership rights and rival rental rights.
@@ -61,13 +69,13 @@ The rental tokens are stored in a double mapping such as this:
 
     mapping(uint256 -> mapping(uint256 -> address)) rentals
 
-The first uint256 stores the `tokenId`. The second uint256 represents the time slot index. Each time slot can be an any duration set at by the smart contract constructor. For example, it can be an hour for a bike rental contract and a day for a property rental contract.
+The first uint256 stores the `tokenId`. The second uint256 represents the time slot index. Each time slot can be any duration set at by the smart contract constructor. For example, it can be an hour for a bike rental contract and a day for a property rental contract.
 
 `startIndex` and `stopIndex` refers to the second uint256 above.
 
 ### approveRentalTransfer
 
-    function approve(address approved, uint256 tokenId, uint256 startIndex, uint256 stopIndex) external returns (bool success)
+    function approveRentalTransfer(address approved, uint256 tokenId, uint256 startIndex, uint256 stopIndex) external returns (bool success)
 
 Approves `approved` (can be the current rental token owner, or a smart contract) to transfer rental tokens within the indices range `startIndex` and `stopIndex` to a third party.
 
@@ -93,7 +101,7 @@ Check if a rental token exists at `index` for token `tokenId`.
 ### ownerOfRental
     function ownerOfRental(uint256 tokenId, uint256 index) public view returns (address)
 
-Returns the owner of the rental token at `index` for token `tokenId`.
+Returns the owner of the rental token within the indices range `startIndex` and `stopIndex` for token `tokenId`.
 
 ### balanceOfRental
     function balanceOfRental(address owner, uint256 tokenId) public view returns (uint256)
