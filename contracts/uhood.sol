@@ -297,13 +297,15 @@ contract PropertyToken is ERC721BasicToken, Owned {
     struct RentalTokenRights {
         bool canBurn;
         bool canTransferToAll;
-        bool canTransferToApproved;
+        bool canTransferToPreapproved;
         bool canCopyAcrossRights;
     }
 
     event PropertyAdded(bytes32 propertyHash, address indexed ownerAddress, string location, uint totalAfter);
     event PropertyRemoved(bytes32 propertyHash, address indexed ownerAddress, string location, uint totalAfter);
-    event RentalTokenApproval(address owner, uint _tokenId, uint _start, uint _end, address renter, address _to);
+    event MintRental(uint _tokenId, uint _start, uint _end, address indexed _renter);
+    event RentalTokenApproval(address owner, uint _tokenId, uint _start, uint _end, address indexed renter, address indexed _to);
+    event TransferRentalFrom(address indexed _from, address indexed _to, uint _tokenId, uint _start, uint _end);
 
     UhoodTokenInterface public token;
     uint public tokensToAddNewProperties;
@@ -322,9 +324,10 @@ contract PropertyToken is ERC721BasicToken, Owned {
     // Mapping for preapproved retners
     mapping (uint => mapping (address => bool)) public preapprovedRenters;
 
-    mapping (address => mapping (uint => uint)) public bondTaken;
-
+    /* mapping (address => mapping (uint => uint)) public bondTaken; */
     modifier onlyPropertyOwnerOrRenter (uint _tokenId, uint _start, uint _end) {
+        uint _startIndex;
+        uint _endIndex;
         (_startIndex, _endIndex) = getTimeIndices(_start, _end);
         if (ownerOf(_tokenId) != msg.sender) {
             for (uint i = _startIndex; i <= _endIndex; i++) {
@@ -335,6 +338,8 @@ contract PropertyToken is ERC721BasicToken, Owned {
     }
 
     modifier onlyRenter (uint _tokenId, uint _start, uint _end) {
+        uint _startIndex;
+        uint _endIndex;
         (_startIndex, _endIndex) = getTimeIndices(_start, _end);
         for (uint i = _startIndex; i <= _endIndex; i++) {
             require(rentals[_tokenId][i] == msg.sender);
@@ -343,6 +348,8 @@ contract PropertyToken is ERC721BasicToken, Owned {
     }
 
     modifier onlyRenterOrApproved (uint _tokenId, uint _start, uint _end) {
+        uint _startIndex;
+        uint _endIndex;
         (_startIndex, _endIndex) = getTimeIndices(_start, _end);
         bool isRenter = true;
         bool isRentalTokenApproved = true;
@@ -354,7 +361,7 @@ contract PropertyToken is ERC721BasicToken, Owned {
             }
 
             if (rentalTokenApprovals[_tokenId][i] != msg.sender) {
-                isRenter = false;
+                isRentalTokenApproved = false;
             }
         }
 
@@ -367,22 +374,6 @@ contract PropertyToken is ERC721BasicToken, Owned {
         tokenAddress = _uhoodToken;
         tokensToAddNewProperties = _tokensToAddNewProperties;
         minRentTime = _minRentTime;
-    }
-
-    /* Helper functions */
-    function hashToInt(bytes32 _propertyHash) public pure returns (uint) {
-        return uint(_propertyHash);
-    }
-
-    function intToHash(uint _tokenId) public pure returns (bytes32) {
-        return bytes32(_tokenId);
-    }
-
-    function getTimeIndices(uint _start, uint _end) public pure returns (uint startIndex, uint endIndex) {
-        require(_start <= _end);
-        uint _startIndex = _start.div(minRentTime);
-        uint _endIndex = _end.div(minRentTime);
-        return (_startIndex, _endIndex);
     }
 
     function addProperty(
@@ -503,22 +494,20 @@ contract PropertyToken is ERC721BasicToken, Owned {
     function mintRental(uint _tokenId, uint _start, uint _end, address _renter)
         public
         onlyOwnerOf(_tokenId)
-        returns(bool)
     {
-        address _renter = msg.sender;
-        bytes32 _propertyHash = bytes32(_tokenId);
-        Property memory property = entries[_propertyHash];
+        /* bytes32 _propertyHash = bytes32(_tokenId); */
+        /* Property memory property = entries[_propertyHash]; */
 
-        require(token.transferFrom(msg.sender, this, property.tokensAsBond));
-        bondTaken[msg.sender][_tokenId] = bondTaken[msg.sender][_tokenId].add(property.tokensAsBond);
+        /* require(token.transferFrom(msg.sender, this, property.tokensAsBond)); */
+        /* bondTaken[msg.sender][_tokenId] = bondTaken[msg.sender][_tokenId].add(property.tokensAsBond); */
 
+        uint _startIndex;
+        uint _endIndex;
         (_startIndex, _endIndex) = getTimeIndices(_start, _end);
 
         // check availability (for all time slots in range)
         for (uint i = _startIndex; i <= _endIndex; i++) {
-            if (!isAvailable(_tokenId, i)) {
-                return false;
-            }
+            require(rentalExists(_tokenId, i));
         }
 
         // mint rental tokens
@@ -526,106 +515,161 @@ contract PropertyToken is ERC721BasicToken, Owned {
             rentals[_tokenId][i] = _renter;
         }
 
-        return true;
+        emit MintRental(_tokenId, _start, _end, _renter);
     }
 
     function setRenterRights(
         uint _tokenId,
-        uint _renter,
+        address _renter,
         bool _canBurn,
         bool _canTransferToAll,
-        bool _canTransferToApproved,
+        bool _canTransferToPreapproved,
         bool _canCopyAcrossRights
     )
         public
-        returns(success)
     {
         require(ownerOf(_tokenId) == msg.sender);
         renterRights[_tokenId][_renter] = RentalTokenRights(
-            _canBurn, _canTransferToAll, _canTransferToApproved, _canCopyAcrossRights);
-        return true;
+            _canBurn, _canTransferToAll, _canTransferToPreapproved, _canCopyAcrossRights);
     }
 
-    function addPreapprovedRenters(uint _tokenId, address[] _preapprovedList) public returns(success) {
+    function addPreapprovedRenters(uint _tokenId, address[] _preapprovedList) public {
+        require(ownerOf(_tokenId) == msg.sender);
         require(_preapprovedList.length > 0);
 
-        for (uint i = 0; i < _preapprovedList.length) {
+        for (uint i = 0; i < _preapprovedList.length; i++) {
             preapprovedRenters[_tokenId][_preapprovedList[i]] = true;
+        }
+    }
+
+    function removePreapprovedRenters(uint _tokenId, address[] _preapprovedList) public {
+        require(ownerOf(_tokenId) == msg.sender);
+        require(_preapprovedList.length > 0);
+
+        for (uint i = 0; i < _preapprovedList.length; i++) {
+            preapprovedRenters[_tokenId][_preapprovedList[i]] = false;
         }
     }
 
     function approveRentalTransfer(address _to, uint _tokenId, uint _start, uint _end)
         public
-        onlyRenter(_tokenId, _startIndex, _endIndex)
     {
         require(_to != 0x0);
-        address renter = msg.sender;
-
+        uint _startIndex;
+        uint _endIndex;
         (_startIndex, _endIndex) = getTimeIndices(_start, _end);
+
+        for (uint i = _startIndex; i <= _endIndex; i++) {
+            require(rentals[_tokenId][i] == msg.sender);
+        }
 
         for (i = _startIndex; i <= _endIndex; i++) {
             rentalTokenApprovals[_tokenId][i] = _to;
         }
-
-        emit RentalTokenApproval(owner, _tokenId, _start, _end, renter, _to);
+        emit RentalTokenApproval(owner, _tokenId, _start, _end, msg.sender, _to);
     }
 
-    function copyAcrossRights(uint _tokenId, address _from, address _to) internal {
-        RentalTokenRights memory rentalTokenRightsFrom = renterRights[_tokenId][_from];
-        RentalTokenRights storage rentalTokenRightsTo = renterRights[_tokenId][_to];
-        rentalTokenRightsTo = rentalTokenRightsFrom;
-    }
+    function transferRentalFrom(address _from, address _to, uint _tokenId, uint _start, uint _end) public {
+        uint _startIndex;
+        uint _endIndex;
+        (_startIndex, _endIndex) = getTimeIndices(_start, _end);
 
-    function transferRentalFrom(address _from, address _to, uint _tokenId, uint _start, uint _end)
-        public onlyRenterOrApproved (_tokenId, _start, _end) returns (bool success)
-    {
-        require(_to != 0x0);
+        bool isRenter = true;
+        bool isRentalTokenApproved = true;
+
+        for (uint i = _startIndex; i <= _endIndex; i++) {
+            if (rentals[_tokenId][i] != msg.sender) {
+                isRenter = false;
+            }
+            if (rentalTokenApprovals[_tokenId][i] != msg.sender) {
+                isRentalTokenApproved = false;
+            }
+        }
+        require(isRenter || isRentalTokenApproved);
 
         RentalTokenRights memory rentalTokenRights = renterRights[_tokenId][_from];
-
-        bool isOK = false;
-
-        if (rentalTokenRights.canBurn && _to == 0x0) {
-            isOK = true;
-        }
-
-        if (rentalTokenRights.canTransferToAll) {
-            isOK = true;
-        }
-
-        if (rentalTokenRights.canTransferToApproved) {
-            if (preapprovedRenters[_tokenId][_preapprovedList[i]] == true) {
-                isOK = true;
-            };
-        }
-
-        require(isOK);
+        require((rentalTokenRights.canBurn && _to == 0x0) ||
+                (rentalTokenRights.canTransferToAll) ||
+                (rentalTokenRights.canTransferToPreapproved && preapprovedRenters[_tokenId][_to] == true));
 
         if (rentalTokenRights.canCopyAcrossRights) {
             copyAcrossRights(_tokenId, _from, _to);
         }
 
-        (_startIndex, _endIndex) = getTimeIndices(_start, _end);
-
         for (i = _startIndex; i <= _endIndex; i++) {
             rentals[_tokenId][i] = _to;
         }
 
-        return true;
+        emit TransferRentalFrom(_from, _to, _tokenId, _start, _end);
     }
 
-    function cancelRental(address _from, uint _tokenId, uint _start, uint _end) pbulic returns(bool){
+    function cancelRental(address _from, uint _tokenId, uint _start, uint _end) public {
         transferRentalFrom(_from, 0x0, _tokenId, _start, _end);
-        return true;
+    }
+
+    // @dev check availability
+    function rentalExists(uint _tokenId, uint _timeIndex) public view returns (bool) {
+        return rentals[_tokenId][_timeIndex] != address(0);
     }
 
     // @dev find renter of token at specific time
-    function getRenter(uint _tokenId, uint _time)
+    function ownerOfRental(uint _tokenId, uint _time)
         public
         view
         returns (address renter)
     {
-        renter = rentals[_tokenId][_time];
+        uint timeIndex = _time.div(minRentTime);
+        renter = rentals[_tokenId][timeIndex];
+    }
+
+    function balanceOfRental(address _renter, uint _tokenId, uint _start, uint _end)
+        public view returns(uint)
+    {
+        uint _startIndex;
+        uint _endIndex;
+        (_startIndex, _endIndex) = getTimeIndices(_start, _end);
+
+        uint rentalTokenCount = 0;
+
+        for (uint i = _startIndex; i <= _endIndex; i++) {
+            if (rentals[_tokenId][i] == _renter) {
+                rentalTokenCount = rentalTokenCount + 1;
+            }
+        }
+        return rentalTokenCount;
+    }
+
+    function balanceOfRentalApproval(address _approved, uint _tokenId, uint _start, uint _end)
+        public view returns(uint)
+    {
+        uint _startIndex;
+        uint _endIndex;
+        (_startIndex, _endIndex) = getTimeIndices(_start, _end);
+
+        uint rentalTokenApprovedCount = 0;
+
+        for (uint i = _startIndex; i <= _endIndex; i++) {
+            if (rentalTokenApprovals[_tokenId][i] == _approved) {
+                rentalTokenApprovedCount = rentalTokenApprovedCount + 1;
+            }
+        }
+        return rentalTokenApprovedCount;
+    }
+
+    /* Helper functions */
+    function hashToInt(bytes32 _propertyHash) public pure returns (uint) {
+        return uint(_propertyHash);
+    }
+
+    function intToHash(uint _tokenId) public pure returns (bytes32) {
+        return bytes32(_tokenId);
+    }
+
+    function getTimeIndices(uint _start, uint _end) public view returns (uint startIndex, uint endIndex) {
+        require(_start <= _end);
+        uint _startIndex = _start.div(minRentTime);
+        uint _endIndex = _end.div(minRentTime);
+        return (_startIndex, _endIndex);
     }
 
     // @dev internal check if reservation date is _isFuture
@@ -634,9 +678,13 @@ contract PropertyToken is ERC721BasicToken, Owned {
         return _time > _now;
     }
 
-    // @dev check availability
-    function isAvailable(uint _tokenId, uint _time) internal view returns (bool) {
-        return rentals[_tokenId][_time] == address(0);
+    function copyAcrossRights(uint _tokenId, address _from, address _to) internal {
+        RentalTokenRights memory rentalTokenRightsFrom = renterRights[_tokenId][_from];
+        RentalTokenRights storage rentalTokenRightsTo = renterRights[_tokenId][_to];
+        rentalTokenRightsTo.canBurn = rentalTokenRightsFrom.canBurn;
+        rentalTokenRightsTo.canTransferToAll = rentalTokenRightsFrom.canTransferToAll;
+        rentalTokenRightsTo.canTransferToPreapproved = rentalTokenRightsFrom.canTransferToPreapproved;
+        rentalTokenRightsTo.canCopyAcrossRights = rentalTokenRightsFrom.canCopyAcrossRights;
     }
 }
 
