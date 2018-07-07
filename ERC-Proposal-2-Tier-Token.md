@@ -61,9 +61,9 @@ While the ERC-809 standard caters for rental rights, it does not tokenise them. 
 
 ### mintRental
 
-    function mintRental(uint256 tokenId, uint256 startIndex, uint256 stopIndex, address renter) external returns (bool success)
+    function mintRental(uint256 tokenId, uint256 start, uint256 end, address renter) external
 
-The owner of the token `tokenId` mints rental tokens and assigns them to `renter`. The number of tokens minted is equal to `stopIndex - startIndex + 1`.
+The owner of the token `tokenId` mints rental tokens and assigns them to `renter`. The start and end time is divided by `minRentTime` to work out the `startIndex` and `endIndex`. The number of tokens minted is equal to `endIndex - startIndex + 1`.
 
 The rental tokens are stored in a double mapping such as this:
 
@@ -71,39 +71,69 @@ The rental tokens are stored in a double mapping such as this:
 
 The first uint256 stores the `tokenId`. The second uint256 represents the time slot index. Each time slot can be any duration set at by the smart contract constructor. For example, it can be an hour for a bike rental contract and a day for a property rental contract.
 
-`startIndex` and `stopIndex` refers to the second uint256 above.
+`startIndex` and `endIndex` refers to the second uint256 above.
+
+### setRentalRights
+
+    function setRenterRights(uint256 tokenId, address renter, bool canBurn, bool canTransferToAll, bool canTransferToPreapproved, bool canCopyAcrossRights) public
+
+Sets the rights for the rental token owner, including the following:
+
+- canBurn: whether or not the renter can burn the token, effecively cancelling the rental agreement
+- canTransferToAll: whether or not the renter can transfer the rental token to anyone else
+- canTransferToPreapproved: whether or not the renter can transfer the rental token to anyone within a list of preapproved renters
+- canCopyAcrrossRights: whether or not the renter can copy across the same rights to the person receiving the rental tokens (as opposed to requiring the owner to manually set the rights for the new rental token owner)
+
+### addPreapprovedRenters
+
+    function addPreapprovedRenters(uint tokenId, address[] preapprovedList) public
+
+Owner adds new addresses to the preapproved renters list.
+
+The preApprovedRenters can be stored inside a double mapping such as this:
+
+     mapping (uint => mapping (address => bool)) public preapprovedRenters;
+
+### removePreapprovedRenters
+
+    function addPreapprovedRenters(uint tokenId, address[] preapprovedList) public
+
+Owner removes a list of addresses from the preapproved renters list.
 
 ### approveRentalTransfer
 
-    function approveRentalTransfer(address approved, uint256 tokenId, uint256 startIndex, uint256 stopIndex) external returns (bool success)
+    function approveRentalTransfer(address approved, uint256 tokenId, uint256 start, uint256 end) public
 
-Approves `approved` (can be the current rental token owner, or a smart contract) to transfer rental tokens within the indices range `startIndex` and `stopIndex` to a third party.
+Rental token holder approves `approved` (can be a market place smart contract) to transfer rental tokens within the time range `start` and `end` to a third party.
 
-### rentalTransferFrom
-    function rentalTransferFrom(address from, address to, uint256 tokenId, uint256 startIndex, uint256 stopIndex) external returns (bool success)
+### transferRentalFrom
+    function rentalTransferFrom(address from, address to, uint256 tokenId, uint256 start, uint256 end) public
 
-Transfers rental rights to a third party. This can be done by the current rental token owner, or a market place smart contract.
+Transfers rental tokens to a third party based on the rental token holder's current rights as set by `setRentalRights`.
 
-This function allows a secondary market to be built to trade the rental rights (e.g. via auctions).
+The transfer can be done by the current rental token owner, or a market place smart contract which is approved by `approveRentalTransfer`. This function allows a secondary market to be built to trade the rental rights.
 
-### burnRental
-    function burnRental(address owner, uint256 tokenId, uint256 startIndex, uint256 stopIndex) external returns (bool success)
+### cancelRental
+    function cancelRental(address owner, uint256 tokenId, uint256 start, uint256 stop) public returns (bool success)
 
-When certain conditions are not met (e.g. paying rent regularly, keeping the properties in a good condition), and when necessary, approved by an arbitration panel, the owner of the token can burn rental tokens within the indices range `startIndex` and `stopIndex`, effectively revoking the rental rights.
-
-In another scenario, the current renter decides to move out early. Upon approval by the owner, the rental agreements are terminated early and the rental tokens are burnt.
+With the owner's approval (by setting `canBurn` to `true` for the renter), the rental token holder can cancel the rental agreement.
 
 ### rentalExists
-    function exists(uint256 tokenId, uint256 index) public view returns (bool)
+    function exists(uint256 tokenId, uint256 timeIndex) public view returns (bool)
 
-Check if a rental token exists at `index` for token `tokenId`.
+Check if a rental token exists at `timeIndex` for token `tokenId`.
 
 ### ownerOfRental
-    function ownerOfRental(uint256 tokenId, uint256 index) public view returns (address)
+    function ownerOfRental(uint256 tokenId, uint256 time) public view returns (address)
 
-Returns the owner of the rental token within the indices range `startIndex` and `stopIndex` for token `tokenId`.
+Returns the owner of the rental token at `time` for token `tokenId`.
 
 ### balanceOfRental
-    function balanceOfRental(address owner, uint256 tokenId) public view returns (uint256)
+    function balanceOfRental(address owner, uint256 tokenId, uint256 start, uint256 end) public view returns (uint256)
 
-Returns the number of rental tokens owned by `owner`.
+Returns the number of rental tokens owned by `owner` between the time `start` and `end`.
+
+### balanceOfRentalApproval
+    function balanceOfRentalApproval(address approved, uint256 tokenId, uint256 start, uint256 end) public view returns (uint256)
+
+Returns the number of rental tokens that `approved` is approved to transfer between the time `start` and `end`.
