@@ -1,10 +1,10 @@
 >ERC:
-Title: Token standard
-Author: Zeming Yu
-Status: Draft
-Type: ERC-1201
-Created: 6 July 2018
-Recommended implementation: TBA
+>Title: Token standard
+>Author: Zeming Yu
+>Status: Draft
+>Type: ERC-1201
+>Created: 6 July 2018
+>Recommended implementation (WIP): https://github.com/vincentshangjin/uhoodchain/blob/erc1201/contracts/uhood.sol
 
 # Summary
 ---
@@ -69,7 +69,7 @@ The rental tokens are stored in a double mapping such as this:
 
     mapping(uint256 -> mapping(uint256 -> address)) rentals
 
-The first uint256 stores the `tokenId`. The second uint256 represents the time slot index. Each time slot can be any duration set at by the smart contract constructor. For example, it can be an hour for a bike rental contract and a day for a property rental contract.
+The first uint256 stores the `tokenId`. The second uint256 represents the time slot index. Each time slot can be any duration set by the smart contract constructor. For example, it can be an hour for a bike rental contract and a day for a property rental contract.
 
 `startIndex` and `endIndex` refers to the second uint256 above.
 
@@ -90,7 +90,7 @@ Sets the rights for the rental token owner, including the following:
 
 Owner adds new addresses to the preapproved renters list.
 
-The preApprovedRenters can be stored inside a double mapping such as this:
+The `preApprovedRenters` can be stored inside a double mapping from the tokenId to the preapproved renter to a bool such as this:
 
      mapping (uint => mapping (address => bool)) public preapprovedRenters;
 
@@ -116,7 +116,7 @@ The transfer can be done by the current rental token owner, or a market place sm
 ### cancelRental
     function cancelRental(address owner, uint256 tokenId, uint256 start, uint256 stop) public returns (bool success)
 
-With the owner's approval (by setting `canBurn` to `true` for the renter), the rental token holder can cancel the rental agreement.
+With the owner's approval (by setting `canBurn` to `true` for the renter), the rental token holder can cancel the rental agreement. This is a wrapper function for `transferRentalFrom`.
 
 ### rentalExists
     function exists(uint256 tokenId, uint256 timeIndex) public view returns (bool)
