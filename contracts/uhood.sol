@@ -167,7 +167,7 @@ library Properties {
         NumberOf bathrooms;
         NumberOf garageSpaces;
         string comments;
-        uint nextAvailableDate;
+        uint initialAvailableDate;
     }
 
     struct Data {
@@ -202,7 +202,7 @@ library Properties {
         NumberOf _bathrooms,
         NumberOf _garageSpaces,
         string _comments,
-        uint _nextAvailableDate)
+        uint _initialAvailableDate)
         public
     {
         bytes32 propertyHash = keccak256(abi.encodePacked(_ownerAddress, _propertyLocation));
@@ -214,7 +214,7 @@ library Properties {
         self.index.push(propertyHash);
         self.entries[propertyHash] = Property(true, self.index.length - 1,
                                             _ownerAddress, _propertyLocation, _propertyType, _bedrooms,
-                                            _bathrooms, _garageSpaces, _comments, _nextAvailableDate);
+                                            _bathrooms, _garageSpaces, _comments, _initialAvailableDate);
         emit PropertyAdded(propertyHash, _ownerAddress, _propertyLocation, self.index.length);
     }
 
@@ -289,7 +289,7 @@ contract PropertyToken is ERC721BasicToken, Owned {
         NumberOf bathrooms;
         NumberOf garageSpaces;
         string comments;
-        uint nextAvailableDate;
+        uint initialAvailableDate;
         uint tokensAsBond;
         address currentRenter;
     }
@@ -324,7 +324,10 @@ contract PropertyToken is ERC721BasicToken, Owned {
     // Mapping for preapproved retners
     mapping (uint => mapping (address => bool)) public preapprovedRenters;
 
-    /* mapping (address => mapping (uint => uint)) public bondTaken; */
+    mapping (uint => mapping (address => bool)) public rentalIntention;
+
+    mapping (address => mapping (uint => uint)) public bondTaken;
+
     modifier onlyPropertyOwnerOrRenter (uint _tokenId, uint _start, uint _end) {
         uint _startIndex;
         uint _endIndex;
@@ -384,7 +387,7 @@ contract PropertyToken is ERC721BasicToken, Owned {
         NumberOf _bathrooms,
         NumberOf _garageSpaces,
         string _comments,
-        uint _nextAvailableDate,
+        uint _initialAvailableDate,
         uint _tokensAsBond,
         address _currentRenter)
         public
@@ -400,7 +403,7 @@ contract PropertyToken is ERC721BasicToken, Owned {
         index.push(propertyHash);
         entries[propertyHash] = Property(true, index.length - 1,
                                             _originalOwnerAddress, _propertyLocation, _propertyType, _bedrooms,
-                                            _bathrooms, _garageSpaces, _comments, _nextAvailableDate,
+                                            _bathrooms, _garageSpaces, _comments, _initialAvailableDate,
                                             _tokensAsBond, _currentRenter);
         _mint(_originalOwnerAddress, uint(propertyHash));
         emit PropertyAdded(propertyHash, _originalOwnerAddress, _propertyLocation, index.length);
@@ -424,15 +427,15 @@ contract PropertyToken is ERC721BasicToken, Owned {
         _burn(_ownerAddress, uint(_propertyHash));
     }
 
-    function updateNextAvailableDate(
+    function updateInitialAvailableDate(
         bytes32 _propertyHash,
-        uint _nextAvailableDate)
+        uint _initialAvailableDate)
         public
         onlyOwnerOf(uint(_propertyHash))
     {
-        require(_nextAvailableDate > 0);
+        require(_initialAvailableDate > 0);
         Property storage property = entries[_propertyHash];
-        property.nextAvailableDate = _nextAvailableDate;
+        property.initialAvailableDate = _initialAvailableDate;
     }
 
     function updatePropertyData(
@@ -476,18 +479,25 @@ contract PropertyToken is ERC721BasicToken, Owned {
             NumberOf bathrooms,
             NumberOf garageSpaces,
             string comments,
-            uint nextAvailableDate,
+            uint initialAvailableDate,
             uint tokensAsBond,
             address currentRenter)
     {
         Property memory property = entries[_propertyHash];
         return (property.exists, property.index, property.originalOwner, property.location, property.propertyType,
                 property.bedrooms, property.bathrooms, property.garageSpaces, property.comments,
-                property.nextAvailableDate, property.tokensAsBond, property.currentRenter);
+                property.initialAvailableDate, property.tokensAsBond, property.currentRenter);
     }
 
     function getPropertyByIndex(uint _index) public view returns (bytes32 property) {
         return index[_index];
+    }
+
+    function updateRentalIntention(uint _tokenId) public {
+        bytes32 _propertyHash = bytes32(_tokenId);
+        Property memory property = entries[_propertyHash];
+        require(token.allowance(msg.sender, this) > property.tokensAsBond);
+        rentalIntention[_tokenId][msg.sender] = true;
     }
 
     // Additional functions for ERC1201
@@ -495,23 +505,28 @@ contract PropertyToken is ERC721BasicToken, Owned {
         public
         onlyOwnerOf(_tokenId)
     {
-        /* bytes32 _propertyHash = bytes32(_tokenId); */
-        /* Property memory property = entries[_propertyHash]; */
-
-        /* require(token.transferFrom(msg.sender, this, property.tokensAsBond)); */
-        /* bondTaken[msg.sender][_tokenId] = bondTaken[msg.sender][_tokenId].add(property.tokensAsBond); */
-
         uint _startIndex;
         uint _endIndex;
         (_startIndex, _endIndex) = getTimeIndices(_start, _end);
 
-        // check availability (for all time slots in range)
+        /* // check availability (for all time slots in range)
         for (uint i = _startIndex; i <= _endIndex; i++) {
             require(rentalExists(_tokenId, i));
         }
 
+        // check if there is intention to rent
+        require(rentalIntention[_tokenId][_renter] == true);
+        // charge bondTaken
+        bytes32 _propertyHash = bytes32(_tokenId);
+        Property memory property = entries[_propertyHash];
+
+        require(token.transferFrom(_renter, this, property.tokensAsBond));
+        bondTaken[msg.sender][_tokenId] = bondTaken[msg.sender][_tokenId].add(property.tokensAsBond);
+
+        require(_start > property.initialAvailableDate); */
+
         // mint rental tokens
-        for (i = _startIndex; i <= _endIndex; i++) {
+        for (uint i = _startIndex; i <= _endIndex; i++) {
             rentals[_tokenId][i] = _renter;
         }
 
@@ -596,6 +611,15 @@ contract PropertyToken is ERC721BasicToken, Owned {
             copyAcrossRights(_tokenId, _from, _to);
         }
 
+        // check if there is intention to rent
+        require(rentalIntention[_tokenId][_to] == true);
+        // charge bondTaken
+        bytes32 _propertyHash = bytes32(_tokenId);
+        Property memory property = entries[_propertyHash];
+
+        require(token.transferFrom(_to, this, property.tokensAsBond));
+        bondTaken[_to][_tokenId] = bondTaken[_to][_tokenId].add(property.tokensAsBond);
+
         for (i = _startIndex; i <= _endIndex; i++) {
             rentals[_tokenId][i] = _to;
         }
@@ -625,14 +649,15 @@ contract PropertyToken is ERC721BasicToken, Owned {
     function balanceOfRental(address _renter, uint _tokenId, uint _start, uint _end)
         public view returns(uint)
     {
-        uint _startIndex;
+        /* uint _startIndex;
         uint _endIndex;
-        (_startIndex, _endIndex) = getTimeIndices(_start, _end);
-
+        (_startIndex, _endIndex) = getTimeIndices(_start, _end); */
+        require(_start <= _end);
+        uint _startIndex = _start.div(minRentTime);
+        uint _endIndex = _end.div(minRentTime);
         uint rentalTokenCount = 0;
-
         for (uint i = _startIndex; i <= _endIndex; i++) {
-            if (rentals[_tokenId][i] == _renter) {
+            if (address(rentals[_tokenId][i]) == _renter) {
                 rentalTokenCount = rentalTokenCount + 1;
             }
         }
@@ -854,7 +879,7 @@ contract Uhood is Owned {
         Properties.NumberOf _bathrooms,
         Properties.NumberOf _garageSpaces,
         string _comments,
-        uint _nextAvailableDate)
+        uint _initialAvailableDate)
         public
     {
         // TODO: implement approveAndCall
@@ -863,7 +888,7 @@ contract Uhood is Owned {
         balances[tokenAddress][msg.sender] = balances[tokenAddress][msg.sender].add(tokensToAddNewProperties);
         emit TokensDeposited(msg.sender, tokenAddress, tokensToAddNewProperties, balances[tokenAddress][msg.sender]);
         properties.add(_propertyOwner, _propertyLocation, _propertyType,
-                        _bedrooms, _bathrooms, _garageSpaces, _comments, _nextAvailableDate);
+                        _bedrooms, _bathrooms, _garageSpaces, _comments, _initialAvailableDate);
     }
 
     function removeProperty(
@@ -884,18 +909,18 @@ contract Uhood is Owned {
         // TODO: Implementation
 
     } */
-    function updateNextAvailableDate(
+    function updateInitialAvailableDate(
         bytes32 _propertyHash,
         /* address _propertyOwner,
         string _propertyLocation, */
-        uint _nextAvailableDate)
+        uint _initialAvailableDate)
         public
         onlyPropertyOwner(_propertyHash)
     {
-        require(_nextAvailableDate > 0);
+        require(_initialAvailableDate > 0);
         /* bytes32 propertyHash = keccak256(abi.encodePacked(_propertyOwner, _propertyLocation)); */
         Properties.Property storage property = properties.entries[_propertyHash];
-        property.nextAvailableDate = _nextAvailableDate;
+        property.initialAvailableDate = _initialAvailableDate;
     }
 
     // function setPropertyLocation(string propertyLocation) public {
@@ -926,13 +951,13 @@ contract Uhood is Owned {
             Properties.NumberOf bathrooms,
             Properties.NumberOf garageSpaces,
             string comments,
-            uint nextAvailableDate)
+            uint initialAvailableDate)
     {
         /* bytes32 propertyHash = keccak256(abi.encodePacked(_ownerAddress, _propertyLocation)); */
         Properties.Property memory property = properties.entries[_propertyHash];
         return (property.exists, property.index, property.owner, property.location, property.propertyType,
                 property.bedrooms, property.bathrooms, property.garageSpaces, property.comments,
-                property.nextAvailableDate);
+                property.initialAvailableDate);
     }
 
     function getPropertyByIndex(uint _index) public view returns (bytes32 property) {

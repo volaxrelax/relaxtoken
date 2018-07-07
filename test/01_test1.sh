@@ -208,12 +208,12 @@ var bedrooms = 3;
 var bathrooms = 2;
 var garageSpaces = 1;
 var comments = "city and harbour view";
-var nextAvailableDate = $START_DATE;
+var initialAvailableDate = $START_DATE;
 
 console.log("RESULT: ----- " + msg + " -----");
 printBalances();
 
-console.log("RESULTS: nextAvailableDate = " + nextAvailableDate);
+console.log("RESULTS: initialAvailableDate = " + initialAvailableDate);
 // var hashOf = "0x" + bytes4ToHex(functionSig) + addressToHex(tokenContractAddress) + addressToHex(from) + addressToHex(to) + uint256ToHex(tokens) + uint256ToHex(fee) + uint256ToHex(nonce);
 var propertyHashJS1 = web3.sha3("0x" + addressToHex(propertyOwner1) + stringToHex(propertyLocation1), {encoding: "hex"})
 console.log("RESULT: propertyHashJS1 = " + propertyHashJS1);
@@ -221,7 +221,7 @@ console.log("RESULT: propertyHashJS1 = " + propertyHashJS1);
 var listingTx1a = token.approve(propertyTokenAddress, new BigNumber("200").shift(18), {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
 }
-var listingTx1b = propertyToken.addProperty(propertyOwner1, propertyLocation1, propertyType, bedrooms, bathrooms, garageSpaces, comments, nextAvailableDate, new BigNumber("123").shift(18), 0x0, {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
+var listingTx1b = propertyToken.addProperty(propertyOwner1, propertyLocation1, propertyType, bedrooms, bathrooms, garageSpaces, comments, initialAvailableDate, new BigNumber("123").shift(18), 0x0, {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
 }
 failIfTxStatusError(listingTx1a, "listingTx1a");
@@ -250,11 +250,11 @@ var garageSpaces = 2;
 var comments = "Swimming Pool - Inground";
 var now = Date.now();
 var future = parseInt(now/1000) + (90*24*60*60);
-var nextAvailableDate = future;
+var initialAvailableDate = future;
 
 console.log("RESULT: ----- " + msg + " -----");
 // printBalances();
-console.log("RESULTS: nextAvailableDate = " + nextAvailableDate);
+console.log("RESULTS: initialAvailableDate = " + initialAvailableDate);
 // var hashOf = "0x" + bytes4ToHex(functionSig) + addressToHex(tokenContractAddress) + addressToHex(from) + addressToHex(to) + uint256ToHex(tokens) + uint256ToHex(fee) + uint256ToHex(nonce);
 var propertyHashJS2 = web3.sha3("0x" + addressToHex(propertyOwner2) + stringToHex(propertyLocation2), {encoding: "hex"})
 console.log("RESULT: propertyHashJS2 = " + propertyHashJS2);
@@ -262,7 +262,7 @@ console.log("RESULT: propertyHashJS2 = " + propertyHashJS2);
 var listingTx2a = token.approve(propertyTokenAddress, new BigNumber("200").shift(18), {from: owner2Account, gas: 500000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
 }
-var listingTx2b = propertyToken.addProperty(propertyOwner2, propertyLocation2, propertyType, bedrooms, bathrooms, garageSpaces, comments, nextAvailableDate, new BigNumber("456").shift(18), 0x0, {from: owner2Account, gas: 500000, gasPrice: defaultGasPrice});
+var listingTx2b = propertyToken.addProperty(propertyOwner2, propertyLocation2, propertyType, bedrooms, bathrooms, garageSpaces, comments, initialAvailableDate, new BigNumber("456").shift(18), 0x0, {from: owner2Account, gas: 500000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
 }
 failIfTxStatusError(listingTx2a, "listingTx2a");
@@ -346,7 +346,7 @@ console.log("RESULT: ");
 
 
 // -----------------------------------------------------------------------------
-var msg = "Owner 1 updates next available date for property 1";
+var msg = "Owner 1 updates initial available date for property 1";
 // -----------------------------------------------------------------------------
 console.log("RESULT: ----- " + msg + " -----");
 
@@ -354,14 +354,14 @@ var now = Date.now();
 var future = parseInt(now/1000) + (30*24*60*60);
 console.log("RESULT: future = " + timestampToStr(future));
 
-var listingTx6 = propertyToken.updateNextAvailableDate(propertyHashJS1, future, {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
+var listingTx6 = propertyToken.updateInitialAvailableDate(propertyHashJS1, future, {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
 }
 failIfTxStatusError(listingTx6, "listingTx6");
 // printBalances();
 
 var propertyData = propertyToken.getPropertyData(propertyHashJS1);
-var nextAvailableDateStr = timestampToStr(propertyData[9]);
+var initialAvailableDateStr = timestampToStr(propertyData[9]);
 
 printTxData("listingTx6", listingTx6);
 printPropertyTokenContractDetails();
@@ -389,6 +389,58 @@ printPropertyTokenContractDetails();
 
 console.log("RESULT: ");
 
+
+// -----------------------------------------------------------------------------
+var msg = "Renter 1 confirms the intention to rent the property and approves the smart contract to charge the bond amount";
+// -----------------------------------------------------------------------------
+console.log("RESULT: ----- " + msg + " -----");
+var aYearLater = parseInt(now/1000) + (365*24*60*60);
+
+var rentingTx1a = token.approve(propertyTokenAddress, new BigNumber("1000").shift(18), {from: renter1Account, gas: 500000, gasPrice: defaultGasPrice});
+while (txpool.status.pending > 0) {
+}
+var rentingTx1b = propertyToken.updateRentalIntention(propertyHashUint1, {from: renter1Account, gas: 6000000, gasPrice: defaultGasPrice});
+while (txpool.status.pending > 0) {
+}
+failIfTxStatusError(rentingTx1a, "rentingTx1a");
+failIfTxStatusError(rentingTx1b, "rentingTx1b");
+printTxData("rentingTx1a", rentingTx1a);
+printTxData("rentingTx1b", rentingTx1b);
+printPropertyTokenContractDetails();
+console.log("RESULT: propertyToken.balanceOfRental(renter1Account, propertyHashUint1, now, aYearLater) = " + propertyToken.balanceOfRental(renter1Account, propertyHashUint1, now, aYearLater));
+console.log("RESULT: propertyToken.balanceOfRental(renter2Account, propertyHashUint1, now, aYearLater) = " + propertyToken.balanceOfRental(renter2Account, propertyHashUint1, now, aYearLater));
+printBalances();
+console.log("RESULT: ");
+
+
+// -----------------------------------------------------------------------------
+var msg = "Owner 1 mints rental tokens to renter 1 and charges renter 1the bond which is held by the smart contract ";
+// -----------------------------------------------------------------------------
+console.log("RESULT: ----- " + msg + " -----");
+var rentalStart = parseInt(now/1000) + (31*24*60*60);
+var rentalEnd = parseInt(now/1000) + (40*24*60*60);
+
+var rentingTx2 = propertyToken.mintRental(propertyHashUint1, rentalStart, rentalEnd, renter1Account, {from: owner1Account, gas: 6000000, gasPrice: defaultGasPrice});
+while (txpool.status.pending > 0) {
+}
+failIfTxStatusError(rentingTx2, "rentingTx2");
+printTxData("rentingTx2", rentingTx2);
+// printPropertyTokenContractDetails();
+console.log("RESULT: propertyToken.balanceOfRental(renter1Account, propertyHashUint1, rentalStart, aYearLater) = " + propertyToken.balanceOfRental(renter1Account, propertyHashUint1, now, aYearLater));
+// console.log("RESULT: propertyToken.balanceOfRental(renter2Account, propertyHashUint1, now, aYearLater) = " + propertyToken.balanceOfRental(renter2Account, propertyHashUint1, now, aYearLater));
+
+console.log("RESULT: " + propertyToken.ownerOfRental(propertyHashUint1, rentalStart - (1*24*60*60)));
+console.log("RESULT: " + propertyToken.ownerOfRental(propertyHashUint1, rentalStart));
+console.log("RESULT: " + propertyToken.ownerOfRental(propertyHashUint1, rentalStart + (1*24*60*60)));
+console.log("RESULT: " + propertyToken.ownerOfRental(propertyHashUint1, rentalStart + (5*24*60*60)));
+console.log("RESULT: " + propertyToken.ownerOfRental(propertyHashUint1, rentalEnd));
+console.log("RESULT: " + propertyToken.ownerOfRental(propertyHashUint1, rentalEnd + (1*24*60*60)));
+
+// printBalances();
+// console.log("RESULT: ");
+
+
+exit;
 
 // -----------------------------------------------------------------------------
 var msg = "Renter 2 reserves the property for a period";
@@ -671,12 +723,12 @@ var bedrooms = 3;
 var bathrooms = 2;
 var garageSpaces = 1;
 var comments = "city and harbour view";
-var nextAvailableDate = $START_DATE;
+var initialAvailableDate = $START_DATE;
 
 console.log("RESULT: ----- " + msg + " -----");
 // printBalances();
 
-console.log("RESULTS: nextAvailableDate = " + nextAvailableDate);
+console.log("RESULTS: initialAvailableDate = " + initialAvailableDate);
 // var hashOf = "0x" + bytes4ToHex(functionSig) + addressToHex(tokenContractAddress) + addressToHex(from) + addressToHex(to) + uint256ToHex(tokens) + uint256ToHex(fee) + uint256ToHex(nonce);
 var propertyHashJS1 = web3.sha3("0x" + addressToHex(propertyOwner1) + stringToHex(propertyLocation1), {encoding: "hex"})
 console.log("RESULT: propertyHashJS1 = " + propertyHashJS1);
@@ -689,7 +741,7 @@ while (txpool.status.pending > 0) {
 }
 failIfTxStatusError(listingTx1a, "listingTx1a");
 
-var listingTx1b = uhood.addProperty(propertyOwner1, propertyLocation1, propertyType, bedrooms, bathrooms, garageSpaces, comments, nextAvailableDate, {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
+var listingTx1b = uhood.addProperty(propertyOwner1, propertyLocation1, propertyType, bedrooms, bathrooms, garageSpaces, comments, initialAvailableDate, {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
 }
 failIfTxStatusError(listingTx1b, "listingTx1b");
@@ -698,7 +750,7 @@ printBalances();
 
 // var propertyData = uhood.getPropertyData(owner1Account, "96/71 Victoria Street, Potts Point NSW 2011")
 var propertyData = uhood.getPropertyData(propertyHashJS1);
-var nextAvailableDateStr = timestampToStr(propertyData[9]);
+var initialAvailableDateStr = timestampToStr(propertyData[9]);
 
 printTxData("listingTx1a", listingTx1a);
 printTxData("listingTx1b", listingTx1b);
@@ -708,7 +760,7 @@ console.log("RESULT: ");
 
 
 // -----------------------------------------------------------------------------
-var msg = "Owner 1 updates next available date";
+var msg = "Owner 1 updates initial available date";
 // -----------------------------------------------------------------------------
 console.log("RESULT: ----- " + msg + " -----");
 
@@ -716,7 +768,7 @@ var now = Date.now();
 var future = parseInt(now/1000) + (30*24*60*60);
 console.log("RESULT: future = " + timestampToStr(future));
 
-var listingTx2 = uhood.updateNextAvailableDate(propertyHashJS1, future, {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
+var listingTx2 = uhood.updateInitialAvailableDate(propertyHashJS1, future, {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
 }
 failIfTxStatusError(listingTx2, "listingTx2");
@@ -724,7 +776,7 @@ failIfTxStatusError(listingTx2, "listingTx2");
 printBalances();
 
 var propertyData = uhood.getPropertyData(propertyHashJS);
-var nextAvailableDateStr = timestampToStr(propertyData[9]);
+var initialAvailableDateStr = timestampToStr(propertyData[9]);
 
 printTxData("listingTx2", listingTx2);
 printUhoodContractDetails();
@@ -743,12 +795,12 @@ var garageSpaces = 2;
 var comments = "Swimming Pool - Inground";
 var now = Date.now();
 var future = parseInt(now/1000) + (90*24*60*60);
-var nextAvailableDate = future;
+var initialAvailableDate = future;
 
 console.log("RESULT: ----- " + msg + " -----");
 printBalances();
 
-console.log("RESULTS: nextAvailableDate = " + nextAvailableDate);
+console.log("RESULTS: initialAvailableDate = " + initialAvailableDate);
 // var hashOf = "0x" + bytes4ToHex(functionSig) + addressToHex(tokenContractAddress) + addressToHex(from) + addressToHex(to) + uint256ToHex(tokens) + uint256ToHex(fee) + uint256ToHex(nonce);
 var propertyHashJS2 = web3.sha3("0x" + addressToHex(propertyOwner2) + stringToHex(propertyLocation2), {encoding: "hex"})
 console.log("RESULT: propertyHashJS = " + propertyHashJS2);
@@ -761,7 +813,7 @@ while (txpool.status.pending > 0) {
 }
 failIfTxStatusError(listingTx3a, "listingTx3");
 
-var listingTx3b = uhood.addProperty(propertyOwner2, propertyLocation2, propertyType, bedrooms, bathrooms, garageSpaces, comments, nextAvailableDate, {from: owner2Account, gas: 500000, gasPrice: defaultGasPrice});
+var listingTx3b = uhood.addProperty(propertyOwner2, propertyLocation2, propertyType, bedrooms, bathrooms, garageSpaces, comments, initialAvailableDate, {from: owner2Account, gas: 500000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
 }
 failIfTxStatusError(listingTx3b, "listingTx3b");
@@ -1166,7 +1218,7 @@ console.log("RESULT: ");
 
 
 EOF
-grep "DATA: " $TEST1OUTPUT | sed "s/DATA: //" > $DEPLOYMENTDATA
-cat $DEPLOYMENTDATA
-grep "RESULT: " $TEST1OUTPUT | sed "s/RESULT: //" > $TEST1RESULTS
-cat $TEST1RESULTS
+#grep "DATA: " $TEST1OUTPUT | sed "s/DATA: //" > $DEPLOYMENTDATA
+#cat $DEPLOYMENTDATA
+#grep "RESULT: " $TEST1OUTPUT | sed "s/RESULT: //" > $TEST1RESULTS
+#cat $TEST1RESULTS

@@ -657,7 +657,7 @@ function printPropertyTokenContractDetails() {
       var data = propertyToken.getPropertyData(property);
       console.log("RESULT: propertyToken.properties[" + i + "]=" + property + " owned by: " + propertyToken.ownerOf(hexToInt(property)) + " [" + data[0] + ", "  + data[1] + ", '" +
         data[2] + "', '" + data[3] + "', '" + printPropertyType(data[4]) + "', " + data[5] + ", " + data[6] + ", " + data[7] + ", '" +
-        data[8]  + "', '" + timestampToStr(data[9])  + "', " + data[10].shift(-decimals) + ", " + data[11] + "]");
+        data[8]  + "', '" + timestampToStr(data[9])  + "', " + data[10].shift(-decimals) + ", " + data[11] + "]");        
     }
 
     var latestBlock = eth.blockNumber;
