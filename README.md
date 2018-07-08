@@ -1,23 +1,20 @@
 # uhoodchain
-The official Github repo of Uhood Chain
+The official Github repo of RELAX token
 
-# testing scenario
-- [x] Deploy contract
-- [x] Owner takes all 500M token (0.1 USD each)
-- [x] Airdrop 1M
-- [x] Exchange 499M
-- [x] 1M airdrop to owner transfers 200 tokens each
-- [x] Renter buys 10000 token from the exchange using ETH
 
-## listing
-- [x] Admin (invite only)
-- [x] Property owner 1, 2 (200 each)
-- [x] Renter 1, 2 (10000 each)
-- [x] Owner 1 lists property, send 100 token to the uhood smart contract, eth address, next available date, property location (can't be updated), property type (appartment, townhouse, house), layout(bedroom count, toilet count, garage count)
-- [x] Can get all the info
-- [x] Onwer can update the next available date
-- [x] Only owner can update the info
-- [x] Owner and delist the property
+# Testing scenario
+- [x] Deploy smart contracts
+- [x] Owner takes all 500M RELAX tokens (0.1 USD each)
+- [x] Owner sends 20000 token to owner 1, 2 and renter 1, 2
+
+## Listing
+- [x] Owner 1 lists property 1 with property data, sending 100 token to the smart contract as a listing fee
+- [x] Can get all the property info
+- [x] Owner 2 lists property 2
+- [x] Owner 2 transfers property 2 to owner 1
+- [x] Owner 1 removes property 2
+- [x] Owner 1 updates initial available date
+- [x] Owner 1 updates other property data
 
 ## Application [Implement these in front end/ centralised database only, not block chain]
 - [ ] Renter 1,2
@@ -30,12 +27,19 @@ The official Github repo of Uhood Chain
 - [ ] Renter 1(the application winner) receives a confirmation
 - [ ] Renter 1 and 2 can withdraw applications before Owner 1 makes a decision
 
-##  Rental agreement issuance and exchange - ERC809 (721 compatible) https://github.com/ethereum/EIPs/issues/809
-- [ ] Build ERC 809 token to represent rental agreements. It contains: property hash (mapped to listed properties), start date, end date, agreed rent, bond, rent payment frequency, inspection frequency, sublease rights
-- [ ] Only property owner can issue ERC 809 tokens.
-- [ ] For each property, the associated ERC 809 tokens cannot have overlapping time periods.
-- [ ] Token holders can transfer ERC 809 tokens to a new tenant who takes over the remaining term
+##  Rental agreement issuance and exchange - ERC-1201 (ERC-721 compatible)
+- [x] Represent property ownership as a standard ERC-721 non-fungible token, and also the first tier token within ERC-1201
+- [ ] Represnet property rental rights as the second tier token
+- [x] Renter 1 confirms the intention to rent the property and approves the smart contract to charge the bond amount
+- [x] Owner 1 mints rental tokens to renter 1 and charges renter 1 the bond which is held by the smart contract
+- [x] Renter 1 approves owner 2 (random person) to transfer the rental tokens
+- [x] Owner 1 authorises renter 1 to transfer to preapproved addresses
+- [x] Owner 1 adds renter 2 and owner 2 to preapproved addresses
+- [x] Renter 2 confirms the intention to rent the property and approves the smart contract to charge the bond amount
+- [x] Owner 2 transfers the rental tokens from renter 1 to renter 2
+- [x] Renter 2 cancels the lease agreement (i.e. burns the rental tokens)
 
 ## Resources
-https://github.com/saurfang/erc809-billboard
+https://github.com/ethereum/EIPs/issues/1201
 https://github.com/ethereum/EIPs/issues/809
+https://github.com/saurfang/erc809-billboard

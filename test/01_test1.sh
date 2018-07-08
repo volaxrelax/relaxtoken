@@ -408,18 +408,16 @@ failIfTxStatusError(rentingTx1b, "rentingTx1b");
 printTxData("rentingTx1a", rentingTx1a);
 printTxData("rentingTx1b", rentingTx1b);
 printPropertyTokenContractDetails();
-console.log("RESULT: propertyToken.balanceOfRental(renter1Account, propertyHashUint1, now, aYearLater) = " + propertyToken.balanceOfRental(renter1Account, propertyHashUint1, now, aYearLater));
-console.log("RESULT: propertyToken.balanceOfRental(renter2Account, propertyHashUint1, now, aYearLater) = " + propertyToken.balanceOfRental(renter2Account, propertyHashUint1, now, aYearLater));
 printBalances();
 console.log("RESULT: ");
 
 
 // -----------------------------------------------------------------------------
-var msg = "Owner 1 mints rental tokens to renter 1 and charges renter 1 the bond which is held by the smart contract ";
+var msg = "Owner 1 mints rental tokens to renter 1 and charges renter 1 the bond which is held by the smart contract";
 // -----------------------------------------------------------------------------
 console.log("RESULT: ----- " + msg + " -----");
 var rentalStart = parseInt(now/1000) + 1 * day;
-var rentalEnd = parseInt(now/1000) + 7 * day; // start date inclusive, end date exclusive 
+var rentalEnd = parseInt(now/1000) + 7 * day; // start date inclusive, end date exclusive
 
 var rentingTx2 = propertyToken.mintRental(propertyHashUint1, rentalStart, rentalEnd, renter1Account, {from: owner1Account, gas: 6000000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
@@ -457,34 +455,31 @@ console.log("RESULT: " + getBalanceOfRental(renter1Account, propertyHashUint1, r
 printBalances();
 console.log("RESULT: ");
 
-exit;
-
 
 // -----------------------------------------------------------------------------
-var msg = "Renter 1 approves the smart contract to transfer the rental tokens";
+var msg = "Renter 1 approves owner 2 (random person) to transfer the rental tokens";
 // -----------------------------------------------------------------------------
 console.log("RESULT: ----- " + msg + " -----");
 
-var rentingTx3 = propertyToken.approveRentalTransfer(propertyTokenAddress, propertyHashUint1, rentalStart, rentalEnd, {from: renter1Account, gas: 6000000, gasPrice: defaultGasPrice});
+var rentingTx3 = propertyToken.approveRentalTransfer(owner2Account, propertyHashUint1, rentalStart, rentalEnd, {from: renter1Account, gas: 6000000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
 }
 failIfTxStatusError(rentingTx3, "rentingTx3");
 printTxData("rentingTx3", rentingTx3);
 
-console.log("RESULT: getBalanceOfRental")
-console.log("RESULT: " + getBalanceOfRental(renter1Account, propertyHashUint1, rentalStart-5*day, rentalStart+60*day));
-console.log("RESULT: getBalanceOfRentalApproval")
-console.log("RESULT: " + getBalanceOfRentalApproval(propertyTokenAddress, propertyHashUint1, rentalStart, rentalEnd));
+console.log("RESULT: getBalanceOfRental(renter1Account, propertyHashUint1, rentalStart-5*day, rentalStart+60*day) = " + getBalanceOfRental(renter1Account, propertyHashUint1, rentalStart-5*day, rentalStart+60*day));
+console.log("RESULT: getBalanceOfRentalApproval(owner2Account, propertyHashUint1, rentalStart, rentalEnd) = " + getBalanceOfRentalApproval(owner2Account, propertyHashUint1, rentalStart, rentalEnd));
 printBalances();
 console.log("RESULT: ");
 
 
 // -----------------------------------------------------------------------------
-var msg = "Owner 1 authorises renter 1 to transfer to all addresses";
+var msg = "Owner 1 authorises renter 1 to transfer to preapproved addresses";
 // -----------------------------------------------------------------------------
 console.log("RESULT: ----- " + msg + " -----");
 
-var rentingTx4 = propertyToken.setRenterRights(propertyHashUint1, renter1Account, true, true, true, true, {from: owner1Account, gas: 6000000, gasPrice: defaultGasPrice});
+// canBurn, canTransferToAll, canTransferToPreapproved, canCopyAcrossRights
+var rentingTx4 = propertyToken.setRenterRights(propertyHashUint1, renter1Account, true, false, true, true, {from: owner1Account, gas: 6000000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
 }
 failIfTxStatusError(rentingTx4, "rentingTx3");
@@ -492,33 +487,95 @@ printTxData("rentingTx4", rentingTx4);
 
 console.log("RESULT: getRenterRights(propertyHashUint1, renter1Account) = " + propertyToken.getRenterRights(propertyHashUint1, renter1Account));
 
-console.log("RESULT: getBalanceOfRental")
-console.log("RESULT: " + getBalanceOfRental(renter1Account, propertyHashUint1, rentalStart-5*day, rentalStart+60*day));
-console.log("RESULT: getBalanceOfRentalApproval")
-console.log("RESULT: " + getBalanceOfRentalApproval(propertyTokenAddress, propertyHashUint1, rentalStart, rentalEnd));
+console.log("RESULT: getBalanceOfRental(renter1Account, propertyHashUint1, rentalStart-5*day, rentalStart+60*day) = " + getBalanceOfRental(renter1Account, propertyHashUint1, rentalStart-5*day, rentalStart+60*day));
+console.log("RESULT: getBalanceOfRentalApproval(owner2Account, propertyHashUint1, rentalStart, rentalEnd) = " + getBalanceOfRentalApproval(owner2Account, propertyHashUint1, rentalStart, rentalEnd));
 printBalances();
 console.log("RESULT: ");
 
 
 // -----------------------------------------------------------------------------
-var msg = "The smart contract transfers the rental tokens from renter 1 to renter 2";
+var msg = "Owner 1 adds renter 2 and owner 2 to preapproved addresses";
 // -----------------------------------------------------------------------------
 console.log("RESULT: ----- " + msg + " -----");
 
-var rentingTx4 = propertyToken.transferRentalFrom(renter1Account, renter2Account, propertyHashUint1, rentalStart, rentalEnd, {from: renter1Account, gas: 6000000, gasPrice: defaultGasPrice});
+// canBurn, canTransferToAll, canTransferToPreapproved, canCopyAcrossRights
+var rentingTx5 = propertyToken.addPreapprovedRenters(propertyHashUint1, [renter2Account, owner2Account], {from: owner1Account, gas: 6000000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
 }
-failIfTxStatusError(rentingTx3, "rentingTx3");
-printTxData("rentingTx3", rentingTx3);
+failIfTxStatusError(rentingTx5, "rentingTx5");
+printTxData("rentingTx5", rentingTx5);
 
-console.log("RESULT: getBalanceOfRental")
-console.log("RESULT: " + getBalanceOfRental(renter1Account, propertyHashUint1, rentalStart-5*day, rentalStart+60*day));
-console.log("RESULT: getBalanceOfRentalApproval")
-console.log("RESULT: " + getBalanceOfRentalApproval(propertyTokenAddress, propertyHashUint1, rentalStart, rentalEnd));
+console.log("RESULT: getRenterRights(propertyHashUint1, renter1Account) = " + propertyToken.getRenterRights(propertyHashUint1, renter1Account));
+console.log("RESULT: getBalanceOfRental(renter1Account, propertyHashUint1, rentalStart-5*day, rentalStart+60*day) = " + getBalanceOfRental(renter1Account, propertyHashUint1, rentalStart-5*day, rentalStart+60*day));
+console.log("RESULT: getBalanceOfRentalApproval(owner2Account, propertyHashUint1, rentalStart, rentalEnd) = " + getBalanceOfRentalApproval(owner2Account, propertyHashUint1, rentalStart, rentalEnd));
+printBalances();
+console.log("RESULT: ");
+
+
+// -----------------------------------------------------------------------------
+var msg = "Renter 2 confirms the intention to rent the property and approves the smart contract to charge the bond amount";
+// -----------------------------------------------------------------------------
+console.log("RESULT: ----- " + msg + " -----");
+var aYearLater = parseInt(now/1000) + (365*24*60*60);
+
+var rentingTx6a = token.approve(propertyTokenAddress, new BigNumber("1000").shift(18), {from: renter2Account, gas: 500000, gasPrice: defaultGasPrice});
+while (txpool.status.pending > 0) {
+}
+var rentingTx6b = propertyToken.updateRentalIntention(propertyHashUint1, {from: renter2Account, gas: 6000000, gasPrice: defaultGasPrice});
+while (txpool.status.pending > 0) {
+}
+failIfTxStatusError(rentingTx6a, "rentingTx6a");
+failIfTxStatusError(rentingTx6b, "rentingTx6b");
+printTxData("rentingTx6a", rentingTx6a);
+printTxData("rentingTx6b", rentingTx6b);
+printPropertyTokenContractDetails();
+printBalances();
+console.log("RESULT: ");
+
+
+// -----------------------------------------------------------------------------
+var msg = "Owner 2 transfers the rental tokens from renter 1 to renter 2";
+// -----------------------------------------------------------------------------
+console.log("RESULT: ----- " + msg + " -----");
+
+var rentingTx7 = propertyToken.transferRentalFrom(renter1Account, renter2Account, propertyHashUint1, rentalStart, rentalEnd, {from: owner2Account, gas: 6000000, gasPrice: defaultGasPrice});
+while (txpool.status.pending > 0) {
+}
+failIfTxStatusError(rentingTx7, "rentingTx7");
+printTxData("rentingTx7", rentingTx5);
+
+console.log("RESULT: getBalanceOfRental(renter1Account, propertyHashUint1, rentalStart-5*day, rentalStart+60*day) = " + getBalanceOfRental(renter1Account, propertyHashUint1, rentalStart-5*day, rentalStart+60*day));
+console.log("RESULT: getBalanceOfRental(renter2Account, propertyHashUint1, rentalStart-5*day, rentalStart+60*day) = " + getBalanceOfRental(renter2Account, propertyHashUint1, rentalStart-5*day, rentalStart+60*day));
+console.log("RESULT: getBalanceOfRentalApproval(owner2Account, propertyHashUint1, rentalStart, rentalEnd) = " + getBalanceOfRentalApproval(owner2Account, propertyHashUint1, rentalStart, rentalEnd));
+printPropertyTokenContractDetails();
+printBalances();
+console.log("RESULT: ");
+
+
+// -----------------------------------------------------------------------------
+var msg = "Renter 2 cancels the lease agreement (i.e. burns the rental tokens)";
+// -----------------------------------------------------------------------------
+console.log("RESULT: ----- " + msg + " -----");
+
+var rentingTx8 = propertyToken.cancelRental(renter2Account, propertyHashUint1, rentalStart, rentalEnd, {from: renter2Account, gas: 6000000, gasPrice: defaultGasPrice});
+while (txpool.status.pending > 0) {
+}
+failIfTxStatusError(rentingTx8, "rentingTx8");
+printTxData("rentingTx8", rentingTx8);
+
+console.log("RESULT: getBalanceOfRental(renter1Account, propertyHashUint1, rentalStart-5*day, rentalStart+60*day) = " + getBalanceOfRental(renter1Account, propertyHashUint1, rentalStart-5*day, rentalStart+60*day));
+console.log("RESULT: getBalanceOfRental(renter2Account, propertyHashUint1, rentalStart-5*day, rentalStart+60*day) = " + getBalanceOfRental(renter2Account, propertyHashUint1, rentalStart-5*day, rentalStart+60*day));
+// Once burned the token count is not trackable as all addresses default to 0x0
+// console.log("RESULT: getBalanceOfRental(0x0, propertyHashUint1, rentalStart-5*day, rentalStart+81*day) = " + getBalanceOfRental(0x0, propertyHashUint1, rentalStart-5*day, rentalStart+81*day));
+console.log("RESULT: getBalanceOfRentalApproval(owner2Account, propertyHashUint1, rentalStart, rentalEnd) = " + getBalanceOfRentalApproval(owner2Account, propertyHashUint1, rentalStart, rentalEnd));
+printPropertyTokenContractDetails();
+printBalances();
+console.log("RESULT: ");
 
 
 
 exit;
+
 
 // -----------------------------------------------------------------------------
 var msg = "Renter 2 reserves the property for a period";
@@ -1296,7 +1353,7 @@ console.log("RESULT: ");
 
 
 EOF
-#grep "DATA: " $TEST1OUTPUT | sed "s/DATA: //" > $DEPLOYMENTDATA
-#cat $DEPLOYMENTDATA
-#grep "RESULT: " $TEST1OUTPUT | sed "s/RESULT: //" > $TEST1RESULTS
-#cat $TEST1RESULTS
+grep "DATA: " $TEST1OUTPUT | sed "s/DATA: //" > $DEPLOYMENTDATA
+cat $DEPLOYMENTDATA
+grep "RESULT: " $TEST1OUTPUT | sed "s/RESULT: //" > $TEST1RESULTS
+cat $TEST1RESULTS
