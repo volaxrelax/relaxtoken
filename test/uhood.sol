@@ -511,9 +511,9 @@ contract PropertyToken is ERC721BasicToken, Owned {
         (_startIndex, _endIndex) = getTimeIndices(_start, _end);
 
         // check availability (for all time slots in range)
-        // for (uint i = _startIndex; i <= _endIndex; i++) {
-        //     require(rentalExists(_tokenId, i));
-        // }
+        for (uint i = _startIndex; i <= _endIndex; i++) {
+            require(!rentalExists(_tokenId, i));
+        }
 
         // // check if there is intention to rent
         require(rentalIntention[_tokenId][_renter] == true);
@@ -527,7 +527,7 @@ contract PropertyToken is ERC721BasicToken, Owned {
         require(_start > property.initialAvailableDate);
 
         // mint rental tokens
-        for (uint i = _startIndex; i < _endIndex; i++) {
+        for (i = _startIndex; i < _endIndex; i++) {
             rentals[_tokenId][i] = _renter;
         }
 
@@ -565,7 +565,7 @@ contract PropertyToken is ERC721BasicToken, Owned {
         require(ownerOf(_tokenId) == msg.sender);
         require(_preapprovedList.length > 0);
 
-      for (uint i = 0; i < _preapprovedList.length; i++) {
+        for (uint i = 0; i < _preapprovedList.length; i++) {
             preapprovedRenters[_tokenId][_preapprovedList[i]] = true;
         }
     }
@@ -624,14 +624,16 @@ contract PropertyToken is ERC721BasicToken, Owned {
             copyAcrossRights(_tokenId, _from, _to);
         }
 
-        // check if there is intention to rent
-        require(rentalIntention[_tokenId][_to] == true);
-        // charge bondTaken
-        bytes32 _propertyHash = bytes32(_tokenId);
-        Property memory property = entries[_propertyHash];
+        // check if there is intention to rent, unless we are burning the tokens
+        if (_to != address(0x0)) {
+            require(rentalIntention[_tokenId][_to] == true);
+            // charge bondTaken
+            bytes32 _propertyHash = bytes32(_tokenId);
+            Property memory property = entries[_propertyHash];
 
-        require(token.transferFrom(_to, this, property.tokensAsBond));
-        bondTaken[_to][_tokenId] = bondTaken[_to][_tokenId].add(property.tokensAsBond);
+            require(token.transferFrom(_to, this, property.tokensAsBond));
+            bondTaken[_to][_tokenId] = bondTaken[_to][_tokenId].add(property.tokensAsBond);
+        }
 
         for (i = _startIndex; i < _endIndex; i++) {
             rentals[_tokenId][i] = _to;
