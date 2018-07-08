@@ -1,6 +1,10 @@
-# uhoodchain
+# RELAX Token
 The official Github repo of RELAX token
 
+# Tokens used in this DApp
+- RELAX token: ERC-20 token, used as a currency token
+- Property token: ERC-1201 token, representing both property ownership rights and rental rights
+- (TODO) Stable coin which is used to pay bond
 
 # Testing scenario
 - [x] Deploy smart contracts
@@ -16,7 +20,7 @@ The official Github repo of RELAX token
 - [x] Owner 1 updates initial available date
 - [x] Owner 1 updates other property data
 
-## Application [Implement these in front end/ centralised database only, not block chain]
+## Application [Implement these in front end/ centralised database only, not on the blockchain]
 - [ ] Renter 1,2
 - [ ] Owner 1
 - [ ] Renter 1 starts application form, provide offer price, applicant information (number of applicant, name, licence no., DOB), employment information (current job title, current employer, annual salary, reference contact, previous job title, previous employer, previous annual salary), rental history information (current rental address, current agency, current agency contact,current rental price, reason to leave, previous rental address, previous agency, previous agency contact)
@@ -29,7 +33,7 @@ The official Github repo of RELAX token
 
 ##  Rental agreement issuance and exchange - ERC-1201 (ERC-721 compatible)
 - [x] Represent property ownership as a standard ERC-721 non-fungible token, and also the first tier token within ERC-1201
-- [ ] Represnet property rental rights as the second tier token
+- [x] Represent property rental rights as the second tier token within ERC-1201
 - [x] Renter 1 confirms the intention to rent the property and approves the smart contract to charge the bond amount
 - [x] Owner 1 mints rental tokens to renter 1 and charges renter 1 the bond which is held by the smart contract
 - [x] Renter 1 approves owner 2 (random person) to transfer the rental tokens
@@ -39,7 +43,6 @@ The official Github repo of RELAX token
 - [x] Owner 2 transfers the rental tokens from renter 1 to renter 2
 - [x] Renter 2 cancels the lease agreement (i.e. burns the rental tokens)
 
-## Resources
+## References
 https://github.com/ethereum/EIPs/issues/1201
 https://github.com/ethereum/EIPs/issues/809
-https://github.com/saurfang/erc809-billboard
