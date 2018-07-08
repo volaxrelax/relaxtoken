@@ -673,3 +673,25 @@ function printPropertyTokenContractDetails() {
     // clubFromBlock = latestBlock + 1;
   }
 }
+
+function getBalanceOfRental(account, tokenId, start, end) {
+  var rentalTokenCount = 0;
+  var minRentTime = 1*24*60*60;
+  for (var time = start; time < end; time = time + minRentTime) {
+    if (propertyToken.ownerOfRental(tokenId, time) == account) {
+      rentalTokenCount++;
+    }
+  }
+  return rentalTokenCount;
+}
+
+function getBalanceOfRentalApproval(account, tokenId, start, end) {
+  var rentalTokenApprovalCount = 0;
+  var minRentTime = 1*24*60*60;
+  for (var time = start; time < end; time = time + minRentTime) {
+    if (propertyToken.approvedOfRental(tokenId, time) == account) {
+      rentalTokenApprovalCount++;
+    }
+  }
+  return rentalTokenApprovalCount;
+}

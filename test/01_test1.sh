@@ -80,6 +80,8 @@ var propertiesLibBin = "0x" + uhoodOutput.contracts["$UHOODSOL:Properties"].bin;
 var propertyTokenAbi = JSON.parse(uhoodOutput.contracts["$UHOODSOL:PropertyToken"].abi);
 var propertyTokenBin = "0x" + uhoodOutput.contracts["$UHOODSOL:PropertyToken"].bin;
 
+var now = Date.now();
+var day = 24*60*60;
 
 console.log("DATA: uhoodAbi=" + JSON.stringify(uhoodAbi));
 console.log("DATA: uhoodBin=" + JSON.stringify(uhoodBin));
@@ -238,156 +240,155 @@ printPropertyTokenContractDetails();
 console.log("RESULT: ");
 
 
-// -----------------------------------------------------------------------------
-var msg = "Owner 2 adds property 2 to the smart contract";
-// -----------------------------------------------------------------------------
-var propertyOwner2 = owner2Account;
-var propertyLocation2 = "136 Raglan Street, Mosman NSW 2088";
-var propertyType = 0; // apartment
-var bedrooms = 5;
-var bathrooms = 3;
-var garageSpaces = 2;
-var comments = "Swimming Pool - Inground";
-var now = Date.now();
-var future = parseInt(now/1000) + (90*24*60*60);
-var initialAvailableDate = future;
+// // -----------------------------------------------------------------------------
+// var msg = "Owner 2 adds property 2 to the smart contract";
+// // -----------------------------------------------------------------------------
+// var propertyOwner2 = owner2Account;
+// var propertyLocation2 = "136 Raglan Street, Mosman NSW 2088";
+// var propertyType = 0; // apartment
+// var bedrooms = 5;
+// var bathrooms = 3;
+// var garageSpaces = 2;
+// var comments = "Swimming Pool - Inground";
+// var future = parseInt(now/1000) + (90*24*60*60);
+// var initialAvailableDate = future;
 
-console.log("RESULT: ----- " + msg + " -----");
+// console.log("RESULT: ----- " + msg + " -----");
+// // printBalances();
+// console.log("RESULTS: initialAvailableDate = " + initialAvailableDate);
+// // var hashOf = "0x" + bytes4ToHex(functionSig) + addressToHex(tokenContractAddress) + addressToHex(from) + addressToHex(to) + uint256ToHex(tokens) + uint256ToHex(fee) + uint256ToHex(nonce);
+// var propertyHashJS2 = web3.sha3("0x" + addressToHex(propertyOwner2) + stringToHex(propertyLocation2), {encoding: "hex"})
+// console.log("RESULT: propertyHashJS2 = " + propertyHashJS2);
+
+// var listingTx2a = token.approve(propertyTokenAddress, new BigNumber("200").shift(18), {from: owner2Account, gas: 500000, gasPrice: defaultGasPrice});
+// while (txpool.status.pending > 0) {
+// }
+// var listingTx2b = propertyToken.addProperty(propertyOwner2, propertyLocation2, propertyType, bedrooms, bathrooms, garageSpaces, comments, initialAvailableDate, new BigNumber("456").shift(18), 0x0, {from: owner2Account, gas: 500000, gasPrice: defaultGasPrice});
+// while (txpool.status.pending > 0) {
+// }
+// failIfTxStatusError(listingTx2a, "listingTx2a");
+// failIfTxStatusError(listingTx2b, "listingTx2b");
+// printTxData("listingTx2a", listingTx2a);
+// printTxData("listingTx2b", listingTx2b);
+
+// var propertyHashUint2 = propertyToken.hashToInt(propertyHashJS2);
+// // var propertyHashUint2_ = new BigNumber(propertyHashJS2.substring(2), 16);
+// var propertyHashUint2_ = hexToInt(propertyHashJS2);
+// console.log(propertyHashUint2_);
+// console.log(propertyHashUint2);
+
+// console.log("RESULT: PropertyToken.ownerOf(propertyHashUint2) = " + propertyToken.ownerOf(propertyHashUint2_));
+// printPropertyTokenContractDetails();
 // printBalances();
-console.log("RESULTS: initialAvailableDate = " + initialAvailableDate);
-// var hashOf = "0x" + bytes4ToHex(functionSig) + addressToHex(tokenContractAddress) + addressToHex(from) + addressToHex(to) + uint256ToHex(tokens) + uint256ToHex(fee) + uint256ToHex(nonce);
-var propertyHashJS2 = web3.sha3("0x" + addressToHex(propertyOwner2) + stringToHex(propertyLocation2), {encoding: "hex"})
-console.log("RESULT: propertyHashJS2 = " + propertyHashJS2);
-
-var listingTx2a = token.approve(propertyTokenAddress, new BigNumber("200").shift(18), {from: owner2Account, gas: 500000, gasPrice: defaultGasPrice});
-while (txpool.status.pending > 0) {
-}
-var listingTx2b = propertyToken.addProperty(propertyOwner2, propertyLocation2, propertyType, bedrooms, bathrooms, garageSpaces, comments, initialAvailableDate, new BigNumber("456").shift(18), 0x0, {from: owner2Account, gas: 500000, gasPrice: defaultGasPrice});
-while (txpool.status.pending > 0) {
-}
-failIfTxStatusError(listingTx2a, "listingTx2a");
-failIfTxStatusError(listingTx2b, "listingTx2b");
-printTxData("listingTx2a", listingTx2a);
-printTxData("listingTx2b", listingTx2b);
-
-var propertyHashUint2 = propertyToken.hashToInt(propertyHashJS2);
-// var propertyHashUint2_ = new BigNumber(propertyHashJS2.substring(2), 16);
-var propertyHashUint2_ = hexToInt(propertyHashJS2);
-console.log(propertyHashUint2_);
-console.log(propertyHashUint2);
-
-console.log("RESULT: PropertyToken.ownerOf(propertyHashUint2) = " + propertyToken.ownerOf(propertyHashUint2_));
-printPropertyTokenContractDetails();
-printBalances();
-console.log("RESULT: ");
+// console.log("RESULT: ");
 
 
-// -----------------------------------------------------------------------------
-var msg = "Owner 2 transfers property 2 to owner 1";
-// -----------------------------------------------------------------------------
-console.log("RESULT: ----- " + msg + " -----");
-// printBalances();
-console.log("RESULT: propertyHashJS2 = " + propertyHashJS2);
-// console.log("RESULT: Before transfer: propertyToken.ownerOf(propertyHashUint2) = " + propertyToken.ownerOf(propertyHashUint2_));
-// console.log("RESULT: Before transfer: propertyToken.balanceOf(propertyOwner1) = " + propertyToken.balanceOf(propertyOwner1));
-// console.log("RESULT: Before transfer: propertyToken.balanceOf(propertyOwner2) = " + propertyToken.balanceOf(propertyOwner2));
-var listingTx3 = propertyToken.safeTransferFrom(propertyOwner2, propertyOwner1, propertyHashUint2, {from: owner2Account, gas: 500000, gasPrice: defaultGasPrice});
-while (txpool.status.pending > 0) {
-}
-failIfTxStatusError(listingTx3, "listingTx3");
-printTxData("listingTx3", listingTx3);
-// console.log("RESULT: After transfer: propertyToken.ownerOf(propertyHashUint2) = " + propertyToken.ownerOf(propertyHashUint2_));
-// console.log("RESULT: After transfer: propertyToken.balanceOf(propertyOwner1) = " + propertyToken.balanceOf(propertyOwner1));
-// console.log("RESULT: After transfer: propertyToken.balanceOf(propertyOwner2) = " + propertyToken.balanceOf(propertyOwner2));
-printPropertyTokenContractDetails();
-console.log("RESULT: ");
+// // -----------------------------------------------------------------------------
+// var msg = "Owner 2 transfers property 2 to owner 1";
+// // -----------------------------------------------------------------------------
+// console.log("RESULT: ----- " + msg + " -----");
+// // printBalances();
+// console.log("RESULT: propertyHashJS2 = " + propertyHashJS2);
+// // console.log("RESULT: Before transfer: propertyToken.ownerOf(propertyHashUint2) = " + propertyToken.ownerOf(propertyHashUint2_));
+// // console.log("RESULT: Before transfer: propertyToken.balanceOf(propertyOwner1) = " + propertyToken.balanceOf(propertyOwner1));
+// // console.log("RESULT: Before transfer: propertyToken.balanceOf(propertyOwner2) = " + propertyToken.balanceOf(propertyOwner2));
+// var listingTx3 = propertyToken.safeTransferFrom(propertyOwner2, propertyOwner1, propertyHashUint2, {from: owner2Account, gas: 500000, gasPrice: defaultGasPrice});
+// while (txpool.status.pending > 0) {
+// }
+// failIfTxStatusError(listingTx3, "listingTx3");
+// printTxData("listingTx3", listingTx3);
+// // console.log("RESULT: After transfer: propertyToken.ownerOf(propertyHashUint2) = " + propertyToken.ownerOf(propertyHashUint2_));
+// // console.log("RESULT: After transfer: propertyToken.balanceOf(propertyOwner1) = " + propertyToken.balanceOf(propertyOwner1));
+// // console.log("RESULT: After transfer: propertyToken.balanceOf(propertyOwner2) = " + propertyToken.balanceOf(propertyOwner2));
+// printPropertyTokenContractDetails();
+// console.log("RESULT: ");
 
 
-// -----------------------------------------------------------------------------
-var msg = "Owner 2 cannot remove property 2";
-// -----------------------------------------------------------------------------
-console.log("RESULT: ----- " + msg + " -----");
-// printBalances();
-console.log("RESULT: propertyHashJS2 = " + propertyHashJS2);
-// console.log("RESULT: Before removal: propertyToken.ownerOf(propertyHashUint2_) = " + propertyToken.ownerOf(propertyHashUint2_));
-// console.log("RESULT: Before removal: propertyToken.balanceOf(propertyOwner1) = " + propertyToken.balanceOf(propertyOwner1));
-// console.log("RESULT: Before removal: propertyToken.balanceOf(propertyOwner2) = " + propertyToken.balanceOf(propertyOwner2));
-var listingTx4 = propertyToken.removeProperty(propertyHashJS2, {from: owner2Account, gas: 500000, gasPrice: defaultGasPrice});
-while (txpool.status.pending > 0) {
-}
-passIfTxStatusError(listingTx4, "listingTx4");
-printTxData("listingTx4", listingTx4);
-// console.log("RESULT: After removal: propertyToken.ownerOf(propertyHashUint2_) = " + propertyToken.ownerOf(propertyHashUint2_));
-// console.log("RESULT: After removal: propertyToken.balanceOf(propertyOwner1) = " + propertyToken.balanceOf(propertyOwner1));
-// console.log("RESULT: After removal: propertyToken.balanceOf(propertyOwner2) = " + propertyToken.balanceOf(propertyOwner2));
-printPropertyTokenContractDetails();
-console.log("RESULT: ");
+// // -----------------------------------------------------------------------------
+// var msg = "Owner 2 cannot remove property 2";
+// // -----------------------------------------------------------------------------
+// console.log("RESULT: ----- " + msg + " -----");
+// // printBalances();
+// console.log("RESULT: propertyHashJS2 = " + propertyHashJS2);
+// // console.log("RESULT: Before removal: propertyToken.ownerOf(propertyHashUint2_) = " + propertyToken.ownerOf(propertyHashUint2_));
+// // console.log("RESULT: Before removal: propertyToken.balanceOf(propertyOwner1) = " + propertyToken.balanceOf(propertyOwner1));
+// // console.log("RESULT: Before removal: propertyToken.balanceOf(propertyOwner2) = " + propertyToken.balanceOf(propertyOwner2));
+// var listingTx4 = propertyToken.removeProperty(propertyHashJS2, {from: owner2Account, gas: 500000, gasPrice: defaultGasPrice});
+// while (txpool.status.pending > 0) {
+// }
+// passIfTxStatusError(listingTx4, "listingTx4");
+// printTxData("listingTx4", listingTx4);
+// // console.log("RESULT: After removal: propertyToken.ownerOf(propertyHashUint2_) = " + propertyToken.ownerOf(propertyHashUint2_));
+// // console.log("RESULT: After removal: propertyToken.balanceOf(propertyOwner1) = " + propertyToken.balanceOf(propertyOwner1));
+// // console.log("RESULT: After removal: propertyToken.balanceOf(propertyOwner2) = " + propertyToken.balanceOf(propertyOwner2));
+// printPropertyTokenContractDetails();
+// console.log("RESULT: ");
 
 
-// -----------------------------------------------------------------------------
-var msg = "Owner 1 removes property 2";
-// -----------------------------------------------------------------------------
-console.log("RESULT: ----- " + msg + " -----");
-// printBalances();
-console.log("RESULT: propertyHashJS2 = " + propertyHashJS2);
-// console.log("RESULT: Before removal: propertyToken.ownerOf(propertyHashUint2_) = " + propertyToken.ownerOf(propertyHashUint2_));
-// console.log("RESULT: Before removal: propertyToken.balanceOf(propertyOwner1) = " + propertyToken.balanceOf(propertyOwner1));
-// console.log("RESULT: Before removal: propertyToken.balanceOf(propertyOwner2) = " + propertyToken.balanceOf(propertyOwner2));
-var listingTx5 = propertyToken.removeProperty(propertyHashJS2, {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
-while (txpool.status.pending > 0) {
-}
-failIfTxStatusError(listingTx5, "listingTx1");
-printTxData("listingTx5", listingTx5);
-// console.log("RESULT: After removal: propertyToken.ownerOf(propertyHashUint2_) = " + propertyToken.ownerOf(propertyHashUint2_));
-// console.log("RESULT: After removal: propertyToken.balanceOf(propertyOwner1) = " + propertyToken.balanceOf(propertyOwner1));
-// console.log("RESULT: After removal: propertyToken.balanceOf(propertyOwner2) = " + propertyToken.balanceOf(propertyOwner2));
-printPropertyTokenContractDetails();
-console.log("RESULT: ");
+// // -----------------------------------------------------------------------------
+// var msg = "Owner 1 removes property 2";
+// // -----------------------------------------------------------------------------
+// console.log("RESULT: ----- " + msg + " -----");
+// // printBalances();
+// console.log("RESULT: propertyHashJS2 = " + propertyHashJS2);
+// // console.log("RESULT: Before removal: propertyToken.ownerOf(propertyHashUint2_) = " + propertyToken.ownerOf(propertyHashUint2_));
+// // console.log("RESULT: Before removal: propertyToken.balanceOf(propertyOwner1) = " + propertyToken.balanceOf(propertyOwner1));
+// // console.log("RESULT: Before removal: propertyToken.balanceOf(propertyOwner2) = " + propertyToken.balanceOf(propertyOwner2));
+// var listingTx5 = propertyToken.removeProperty(propertyHashJS2, {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
+// while (txpool.status.pending > 0) {
+// }
+// failIfTxStatusError(listingTx5, "listingTx1");
+// printTxData("listingTx5", listingTx5);
+// // console.log("RESULT: After removal: propertyToken.ownerOf(propertyHashUint2_) = " + propertyToken.ownerOf(propertyHashUint2_));
+// // console.log("RESULT: After removal: propertyToken.balanceOf(propertyOwner1) = " + propertyToken.balanceOf(propertyOwner1));
+// // console.log("RESULT: After removal: propertyToken.balanceOf(propertyOwner2) = " + propertyToken.balanceOf(propertyOwner2));
+// printPropertyTokenContractDetails();
+// console.log("RESULT: ");
 
 
-// -----------------------------------------------------------------------------
-var msg = "Owner 1 updates initial available date for property 1";
-// -----------------------------------------------------------------------------
-console.log("RESULT: ----- " + msg + " -----");
+// // -----------------------------------------------------------------------------
+// var msg = "Owner 1 updates initial available date for property 1";
+// // -----------------------------------------------------------------------------
+// console.log("RESULT: ----- " + msg + " -----");
 
-var now = Date.now();
-var future = parseInt(now/1000) + (30*24*60*60);
-console.log("RESULT: future = " + timestampToStr(future));
+// var now = Date.now();
+// var future = parseInt(now/1000) + (30*24*60*60);
+// console.log("RESULT: future = " + timestampToStr(future));
 
-var listingTx6 = propertyToken.updateInitialAvailableDate(propertyHashJS1, future, {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
-while (txpool.status.pending > 0) {
-}
-failIfTxStatusError(listingTx6, "listingTx6");
-// printBalances();
+// var listingTx6 = propertyToken.updateInitialAvailableDate(propertyHashJS1, future, {from: owner1Account, gas: 500000, gasPrice: defaultGasPrice});
+// while (txpool.status.pending > 0) {
+// }
+// failIfTxStatusError(listingTx6, "listingTx6");
+// // printBalances();
 
-var propertyData = propertyToken.getPropertyData(propertyHashJS1);
-var initialAvailableDateStr = timestampToStr(propertyData[9]);
+// var propertyData = propertyToken.getPropertyData(propertyHashJS1);
+// var initialAvailableDateStr = timestampToStr(propertyData[9]);
 
-printTxData("listingTx6", listingTx6);
-printPropertyTokenContractDetails();
-console.log("RESULT: ");
+// printTxData("listingTx6", listingTx6);
+// printPropertyTokenContractDetails();
+// console.log("RESULT: ");
 
 
-// -----------------------------------------------------------------------------
-var msg = "Owner 1 updates property data";
-// -----------------------------------------------------------------------------
-console.log("RESULT: ----- " + msg + " -----");
+// // -----------------------------------------------------------------------------
+// var msg = "Owner 1 updates property data";
+// // -----------------------------------------------------------------------------
+// console.log("RESULT: ----- " + msg + " -----");
 
-var propertyType = 1; // apartment
-var bedrooms = 3;
-var bathrooms = 6;
-var garageSpaces = 2;
-var comments = "city and harbour view, school zone";
+// var propertyType = 1; // apartment
+// var bedrooms = 3;
+// var bathrooms = 6;
+// var garageSpaces = 2;
+// var comments = "city and harbour view, school zone";
 
-var listingTx7 = propertyToken.updatePropertyData(propertyHashJS1, propertyType, bedrooms, bathrooms, garageSpaces, comments, new BigNumber("789").shift(18), renter1Account, {from: owner1Account, gas: 5000000, gasPrice: defaultGasPrice});
-while (txpool.status.pending > 0) {
-}
-failIfTxStatusError(listingTx7, "listingTx7");
-printTxData("listingTx7", listingTx7);
-printPropertyTokenContractDetails();
-// printBalances();
+// var listingTx7 = propertyToken.updatePropertyData(propertyHashJS1, propertyType, bedrooms, bathrooms, garageSpaces, comments, new BigNumber("789").shift(18), renter1Account, {from: owner1Account, gas: 5000000, gasPrice: defaultGasPrice});
+// while (txpool.status.pending > 0) {
+// }
+// failIfTxStatusError(listingTx7, "listingTx7");
+// printTxData("listingTx7", listingTx7);
+// printPropertyTokenContractDetails();
+// // printBalances();
 
-console.log("RESULT: ");
+// console.log("RESULT: ");
 
 
 // -----------------------------------------------------------------------------
@@ -414,11 +415,11 @@ console.log("RESULT: ");
 
 
 // -----------------------------------------------------------------------------
-var msg = "Owner 1 mints rental tokens to renter 1 and charges renter 1the bond which is held by the smart contract ";
+var msg = "Owner 1 mints rental tokens to renter 1 and charges renter 1 the bond which is held by the smart contract ";
 // -----------------------------------------------------------------------------
 console.log("RESULT: ----- " + msg + " -----");
-var rentalStart = parseInt(now/1000) + (31*24*60*60);
-var rentalEnd = parseInt(now/1000) + (40*24*60*60);
+var rentalStart = parseInt(now/1000) + 1 * day;
+var rentalEnd = parseInt(now/1000) + 7 * day; // start date inclusive, end date exclusive 
 
 var rentingTx2 = propertyToken.mintRental(propertyHashUint1, rentalStart, rentalEnd, renter1Account, {from: owner1Account, gas: 6000000, gasPrice: defaultGasPrice});
 while (txpool.status.pending > 0) {
@@ -426,18 +427,95 @@ while (txpool.status.pending > 0) {
 failIfTxStatusError(rentingTx2, "rentingTx2");
 printTxData("rentingTx2", rentingTx2);
 // printPropertyTokenContractDetails();
-console.log("RESULT: propertyToken.balanceOfRental(renter1Account, propertyHashUint1, rentalStart, aYearLater) = " + propertyToken.balanceOfRental(renter1Account, propertyHashUint1, now, aYearLater));
+// console.log("RESULT: propertyToken.balanceOfRental(renter1Account, propertyHashUint1, rentalStart, aYearLater) = " + propertyToken.balanceOfRental(renter1Account, propertyHashUint1, now, aYearLater));
 // console.log("RESULT: propertyToken.balanceOfRental(renter2Account, propertyHashUint1, now, aYearLater) = " + propertyToken.balanceOfRental(renter2Account, propertyHashUint1, now, aYearLater));
 
-console.log("RESULT: " + propertyToken.ownerOfRental(propertyHashUint1, rentalStart - (1*24*60*60)));
-console.log("RESULT: " + propertyToken.ownerOfRental(propertyHashUint1, rentalStart));
-console.log("RESULT: " + propertyToken.ownerOfRental(propertyHashUint1, rentalStart + (1*24*60*60)));
-console.log("RESULT: " + propertyToken.ownerOfRental(propertyHashUint1, rentalStart + (5*24*60*60)));
-console.log("RESULT: " + propertyToken.ownerOfRental(propertyHashUint1, rentalEnd));
-console.log("RESULT: " + propertyToken.ownerOfRental(propertyHashUint1, rentalEnd + (1*24*60*60)));
+// console.log("RESULT: " + propertyToken.ownerOfRental(propertyHashUint1, rentalStart - (1*24*60*60)));
+// console.log("RESULT: " + propertyToken.ownerOfRental(propertyHashUint1, rentalStart));
+// console.log("RESULT: " + propertyToken.ownerOfRental(propertyHashUint1, rentalStart + (1*24*60*60)));
+// console.log("RESULT: " + propertyToken.ownerOfRental(propertyHashUint1, rentalEnd + (1*24*60*60)));
 
-// printBalances();
-// console.log("RESULT: ");
+// console.log("RESULT: day = " + day);
+// console.log("RESULT: rentalStart = " + rentalStart);
+// console.log("RESULT: rentalStart-20*day = " + (rentalStart-20*day));
+// for (i = 0; i < 15; i++) {
+//   console.log("RESULT: [" + i + "] = " + (rentalStart-5*day) + " " + (i*day) + " " + getBalanceOfRental(renter1Account, propertyHashUint1, rentalStart-5*day, rentalStart-5*day+i*day));
+// }
+
+console.log("RESULT: getBalanceOfRental")
+console.log("RESULT: " + getBalanceOfRental(renter1Account, propertyHashUint1, rentalStart-5*day, rentalStart+60*day));
+// console.log("RESULT: " + getBalanceOfRental(renter1Account, propertyHashUint1, rentalStart-5*day, rentalStart-1*day));
+// console.log("RESULT: " + getBalanceOfRental(renter1Account, propertyHashUint1, rentalStart-1*day, rentalStart-0*day));
+// console.log("RESULT: " + getBalanceOfRental(renter1Account, propertyHashUint1, rentalStart+0*day, rentalStart+20*day));
+// console.log("RESULT: " + getBalanceOfRental(renter1Account, propertyHashUint1, rentalStart+20*day, rentalStart+100*day));
+
+// console.log("RESULT: getBalanceOfRentalApproval")
+// console.log("RESULT: " + getBalanceOfRentalApproval(renter1Account, propertyHashUint1, rentalStart-5*day, rentalStart-1*day));
+// console.log("RESULT: " + getBalanceOfRentalApproval(renter1Account, propertyHashUint1, rentalStart-1*day, rentalStart-0*day));
+// console.log("RESULT: " + getBalanceOfRentalApproval(renter1Account, propertyHashUint1, rentalStart+0*day, rentalStart+20*day));
+// console.log("RESULT: " + getBalanceOfRentalApproval(renter1Account, propertyHashUint1, rentalStart+20*day, rentalStart+100*day));
+printBalances();
+console.log("RESULT: ");
+
+exit;
+
+
+// -----------------------------------------------------------------------------
+var msg = "Renter 1 approves the smart contract to transfer the rental tokens";
+// -----------------------------------------------------------------------------
+console.log("RESULT: ----- " + msg + " -----");
+
+var rentingTx3 = propertyToken.approveRentalTransfer(propertyTokenAddress, propertyHashUint1, rentalStart, rentalEnd, {from: renter1Account, gas: 6000000, gasPrice: defaultGasPrice});
+while (txpool.status.pending > 0) {
+}
+failIfTxStatusError(rentingTx3, "rentingTx3");
+printTxData("rentingTx3", rentingTx3);
+
+console.log("RESULT: getBalanceOfRental")
+console.log("RESULT: " + getBalanceOfRental(renter1Account, propertyHashUint1, rentalStart-5*day, rentalStart+60*day));
+console.log("RESULT: getBalanceOfRentalApproval")
+console.log("RESULT: " + getBalanceOfRentalApproval(propertyTokenAddress, propertyHashUint1, rentalStart, rentalEnd));
+printBalances();
+console.log("RESULT: ");
+
+
+// -----------------------------------------------------------------------------
+var msg = "Owner 1 authorises renter 1 to transfer to all addresses";
+// -----------------------------------------------------------------------------
+console.log("RESULT: ----- " + msg + " -----");
+
+var rentingTx4 = propertyToken.setRenterRights(propertyHashUint1, renter1Account, true, true, true, true, {from: owner1Account, gas: 6000000, gasPrice: defaultGasPrice});
+while (txpool.status.pending > 0) {
+}
+failIfTxStatusError(rentingTx4, "rentingTx3");
+printTxData("rentingTx4", rentingTx4);
+
+console.log("RESULT: getRenterRights(propertyHashUint1, renter1Account) = " + propertyToken.getRenterRights(propertyHashUint1, renter1Account));
+
+console.log("RESULT: getBalanceOfRental")
+console.log("RESULT: " + getBalanceOfRental(renter1Account, propertyHashUint1, rentalStart-5*day, rentalStart+60*day));
+console.log("RESULT: getBalanceOfRentalApproval")
+console.log("RESULT: " + getBalanceOfRentalApproval(propertyTokenAddress, propertyHashUint1, rentalStart, rentalEnd));
+printBalances();
+console.log("RESULT: ");
+
+
+// -----------------------------------------------------------------------------
+var msg = "The smart contract transfers the rental tokens from renter 1 to renter 2";
+// -----------------------------------------------------------------------------
+console.log("RESULT: ----- " + msg + " -----");
+
+var rentingTx4 = propertyToken.transferRentalFrom(renter1Account, renter2Account, propertyHashUint1, rentalStart, rentalEnd, {from: renter1Account, gas: 6000000, gasPrice: defaultGasPrice});
+while (txpool.status.pending > 0) {
+}
+failIfTxStatusError(rentingTx3, "rentingTx3");
+printTxData("rentingTx3", rentingTx3);
+
+console.log("RESULT: getBalanceOfRental")
+console.log("RESULT: " + getBalanceOfRental(renter1Account, propertyHashUint1, rentalStart-5*day, rentalStart+60*day));
+console.log("RESULT: getBalanceOfRentalApproval")
+console.log("RESULT: " + getBalanceOfRentalApproval(propertyTokenAddress, propertyHashUint1, rentalStart, rentalEnd));
+
 
 
 exit;
